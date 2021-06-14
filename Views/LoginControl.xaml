@@ -164,7 +164,8 @@
                            TextAlignment="Center">
                     Нет аккаунта? 
                     <Hyperlink Cursor="Hand"
-                               Command="{Binding RegisterCommand}">
+                               Command="{Binding RegisterCommand}"
+                               IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}">
                         Зарегистрироваться
                     </Hyperlink>
                 </TextBlock>

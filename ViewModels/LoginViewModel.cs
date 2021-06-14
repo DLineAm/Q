@@ -70,7 +70,7 @@ namespace Q.ViewModels
 
         private void ChangePanel()
         {
-            TabMappingService.ChangeTab<RegisterControl>(TabMappingService.GetVm<RegisterViewModel>());
+            TabMappingService.ChangeTab<RegisterControl>(TabMappingService.GetVm<RegisterViewModel>(), PageMoveType.Next);
         }
 
         private void Signin(/*object param*/)

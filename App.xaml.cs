@@ -15,7 +15,7 @@ namespace Q
         protected override Window CreateShell()
         {
             var window = Container.Resolve<MainWindow>();
-            TabMappingService.ChangeTab<LoginControl>(TabMappingService.GetVm<LoginViewModel>());
+            TabMappingService.ChangeTab<LoginControl>(TabMappingService.GetVm<LoginViewModel>(), PageMoveType.None);
             window.DataContext = Vm;
             return window;
         }

@@ -84,7 +84,8 @@
                                  Height="35"
                                  x:Name="pswd"
                                  Background="AliceBlue"
-                                 BorderThickness="0"/>
+                                 BorderThickness="0"
+                                 Text="{Binding Email}"/>
                         <!--<TextBox Width="300"
                              FontSize="14"
                              Height="35"
@@ -101,14 +102,14 @@
                                <!--Visibility="{Binding ElementName=pswd, Path=Password.IsEmpty, Converter={StaticResource InverseBoolToVisibilityConverter}}">-->
                         <TextBlock.Visibility>
                             <MultiBinding Converter="{StaticResource TextInputToVisibilityConverter}">
-                                <Binding Path="Password.IsEmpty"/>
+                                <Binding ElementName="pswd"  Path="Text.IsEmpty"/>
                                 <Binding ElementName="pswd"
                                          Path="IsFocused"/>
                             </MultiBinding>
                         </TextBlock.Visibility>
                     </TextBlock>
 
-                    <!--<Button HorizontalAlignment="Right"
+                    <Button HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Margin="0,0,5,0"
                             Height="20"
@@ -126,11 +127,11 @@
                                   Margin="0,2,0,0" />
                         </Button.Content>
                         <Button.Visibility>
-                            <Binding 
-                                     Path="Password.IsEmpty"
-                                     Converter="{StaticResource BoolToVisibilityConverter}" />
+                            <Binding ElementName="pswd"
+                                     Path="Text.IsEmpty"
+                                     Converter="{services:BoolToVisibilityConverter}" />
                         </Button.Visibility>
-                    </Button>-->
+                    </Button>
                 </Grid>
                 <!--CommandParameter="{Binding ElementName=pswd}"-->
                 <Button Height="35"
@@ -162,7 +163,8 @@
                            TextAlignment="Center">
                     Есть аккаунт? 
                     <Hyperlink Cursor="Hand"
-                               Command="{Binding SignInCommand}">
+                               Command="{Binding SignInCommand}"
+                               IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}">
                         Войти
                     </Hyperlink>
                 </TextBlock>
