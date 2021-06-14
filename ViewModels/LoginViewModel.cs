@@ -14,7 +14,12 @@ namespace Q.ViewModels
 
         public LoginViewModel()
         {
-            _loadingTimer.Tick += (s, e) => App.Vm.IsLoading = false;
+            _loadingTimer.Tick += (s, e) =>
+            {
+                App.Vm.IsLoading = false;
+                App.Vm.IsEnabled = true;
+                _loadingTimer.Stop();
+            };
         }
 
         private string _password;
@@ -70,6 +75,7 @@ namespace Q.ViewModels
 
         private void ChangePanel()
         {
+            Password = string.Empty;
             TabMappingService.ChangeTab<RegisterControl>(TabMappingService.GetVm<RegisterViewModel>(), PageMoveType.Next);
         }
 
@@ -92,6 +98,7 @@ namespace Q.ViewModels
                 return;
             }
             ErrorVisibility = Visibility.Collapsed;
+            App.Vm.IsEnabled = false;
             App.Vm.IsLoading = true;
             _loadingTimer.Start();
         }

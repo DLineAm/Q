@@ -118,7 +118,7 @@
                                                  From="470"
                                                  To="0">
                                     <DoubleAnimation.EasingFunction>
-                                        <PowerEase Power="3"></PowerEase>
+                                        <PowerEase Power="2"></PowerEase>
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
                             </Storyboard>
@@ -149,7 +149,7 @@
                                                                From="0"
                                                                To="470">
                                     <DoubleAnimation.EasingFunction>
-                                        <PowerEase Power="3"></PowerEase>
+                                        <PowerEase Power="2"></PowerEase>
                                     </DoubleAnimation.EasingFunction>
                                 </DoubleAnimation>
                             </Storyboard>
@@ -176,14 +176,22 @@
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>
                             <Storyboard>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Width"
+                                <!--<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Width"
                                                                Duration="0:0:0.3">
                                     <LinearDoubleKeyFrame KeyTime="0%" Value="0"></LinearDoubleKeyFrame>
                                     <LinearDoubleKeyFrame KeyTime="25%" Value="117.5"></LinearDoubleKeyFrame>
                                     <LinearDoubleKeyFrame KeyTime="50%" Value="235"></LinearDoubleKeyFrame>
                                     <LinearDoubleKeyFrame KeyTime="75%" Value="352.5"></LinearDoubleKeyFrame>
                                     <LinearDoubleKeyFrame KeyTime="100%" Value="470"></LinearDoubleKeyFrame>
-                                </DoubleAnimationUsingKeyFrames>
+                                </DoubleAnimationUsingKeyFrames>-->
+                                <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                 Duration="0:0:0.3"
+                                                 From="0"
+                                                 To="470">
+                                    <DoubleAnimation.EasingFunction>
+                                        <PowerEase Power="2"></PowerEase>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
                             </Storyboard>
                         </BeginStoryboard>
                     </DataTrigger.EnterActions>
@@ -236,7 +244,7 @@
                 </Border>
                 <Border
                         Name="mainBorder"
-                        Width="450"
+                        Width="470"
                         Style="{StaticResource PanelAnimStyle}">
                     <ContentControl Content="{Binding CurrentView}">
 

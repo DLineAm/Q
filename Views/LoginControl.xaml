@@ -33,6 +33,7 @@
                              FontSize="14"
                              Height="35"
                              x:Name="login"
+                             IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"
                              Text="{Binding Login}">
                     </TextBox>
                     <TextBlock Text="Логин"
@@ -86,7 +87,8 @@
                                  PasswordChar="●"
                                  Background="AliceBlue"
                                  BorderThickness="0" PasswordChanged="PswdChanged"
-                                 Cursor="IBeam"/>
+                                 Cursor="IBeam"
+                                 IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"/>
                         <!--<TextBox Width="300"
                              FontSize="14"
                              Height="35"
@@ -141,7 +143,8 @@
                         Foreground="White"
                         FontSize="15"
                         Command="{Binding SigninCommand}"
-                        Cursor="Hand">
+                        Cursor="Hand"
+                        IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}">
                     <Button.Content>
                         <TextBlock Text="Войти"
                                    FontWeight="Bold" />
