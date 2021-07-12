@@ -19,19 +19,14 @@
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="CanMinimize"
-        d:DataContext="{d:DesignInstance Type={x:Type viewModels:MainWindowViewModel}}">
+        d:DataContext="{d:DesignInstance Type={x:Type viewModels:MainWindowViewModel}}"
+        WindowStartupLocation="CenterScreen">
 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="25"></WindowChrome>
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <s:TextInputToVisibilityConverter x:Key="TextInputToVisibilityConverter" />
-        <s:InverseTextInputToVisibilityConverter x:Key="InverseTextInputToVisibilityConverter" />
-        <s:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <s:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
-        <s:IntToBoolConverter x:Key="IntToBoolConverter"></s:IntToBoolConverter>
-
         <Storyboard x:Key="Wave">
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.OpacityMask).(Brush.RelativeTransform).(TransformGroup.Children)[3].(TranslateTransform.X)"
                              RepeatBehavior="Forever"
@@ -127,6 +122,46 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+         <!--<Style x:Key="BackgroundAnimStyle" TargetType="Border" >
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PageMoveType}"
+                             Value="None">
+                    
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 To="0"
+                                                 Duration="0">
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                --><!--<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Width"
+                                                               Duration="0:0:0.4">
+                                    <LinearDoubleKeyFrame KeyTime="0%" Value="470"></LinearDoubleKeyFrame>
+                                    <LinearDoubleKeyFrame KeyTime="25%" Value="352.5"></LinearDoubleKeyFrame>
+                                    <LinearDoubleKeyFrame KeyTime="50%" Value="235"></LinearDoubleKeyFrame>
+                                    <LinearDoubleKeyFrame KeyTime="75%" Value="117.5"></LinearDoubleKeyFrame>
+                                    <LinearDoubleKeyFrame KeyTime="100%" Value="0"></LinearDoubleKeyFrame>
+                                </DoubleAnimationUsingKeyFrames>--><!--
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 Duration="0:0:0.3"
+                                                 To="1">
+                                    <DoubleAnimation.EasingFunction>
+                                        <PowerEase Power="2"></PowerEase>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>-->
 
         <Style TargetType="Border" x:Key="BorderPanelStyle">
             <Style.Triggers>
@@ -246,17 +281,19 @@
                         Name="mainBorder"
                         Width="470"
                         Style="{StaticResource PanelAnimStyle}">
-                    <ContentControl Content="{Binding CurrentView}">
+                    <Grid>
+                        <ContentControl Content="{Binding CurrentView}" Width="470">
 
-                    </ContentControl>
-                   
+                        </ContentControl>
+                        <!--<Border Style="{StaticResource BackgroundAnimStyle}" Background="Black"></Border>-->
+                    </Grid>
                     
                 </Border>
                 <Border 
                         Width="0"
                         Name="secBorder"
                         Style="{StaticResource BorderPanelStyle}">
-                    <ContentControl Content="{Binding NextView}">
+                    <ContentControl Content="{Binding NextView}" Width="470">
 
                     </ContentControl>
                 </Border>

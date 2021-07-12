@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Grpc.Net.Client;
 using Prism.Commands;
 using Prism.Mvvm;
 using Q.Services;
@@ -14,7 +15,7 @@ namespace Q.ViewModels
     {
         
 
-        private string _title = "Окно авторизации";
+        private string _title = App.NameTitle + "Окно авторизации";
         public string Title
         {
             get => _title;
@@ -23,7 +24,7 @@ namespace Q.ViewModels
 
         public MainWindowViewModel()
         {
-            
+           
         }
 
         private bool _isEnabled = true;

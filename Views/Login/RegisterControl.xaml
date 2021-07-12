@@ -1,14 +1,14 @@
-﻿<UserControl x:Class="Q.Views.LoginControl"
+﻿<UserControl x:Class="Q.Views.RegisterControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Q.Views"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:services="clr-namespace:Q.Services"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
+     <UserControl.Resources>
         <services:TextInputToVisibilityConverter x:Key="TextInputToVisibilityConverter" />
         <services:InverseTextInputToVisibilityConverter x:Key="InverseTextInputToVisibilityConverter" />
         <services:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
@@ -19,7 +19,7 @@
             <StackPanel  VerticalAlignment="Center"
                          HorizontalAlignment="Center"
                          Margin="0,0,0,70">
-                <TextBlock Text="Вход в аккаунт"
+                <TextBlock Text="Регистрация"
                            Grid.Row="1"
                            Foreground="White"
                            FontSize="18"
@@ -33,7 +33,6 @@
                              FontSize="14"
                              Height="35"
                              x:Name="login"
-                             IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"
                              Text="{Binding Login}">
                     </TextBox>
                     <TextBlock Text="Логин"
@@ -58,6 +57,7 @@
                             Margin="0,0,5,0"
                             Height="20"
                             Width="20"
+                            IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"
                             Background="Transparent"
                             BorderThickness="0"
                             Command="{Binding ClearTextCommand}">
@@ -80,22 +80,20 @@
                 </Grid>
 
                 <Grid>
-                    <PasswordBox Width="300"
+                    <TextBox Width="300"
                                  FontSize="14"
                                  Height="35"
                                  x:Name="pswd"
-                                 PasswordChar="●"
                                  Background="AliceBlue"
-                                 BorderThickness="0" PasswordChanged="PswdChanged"
-                                 Cursor="IBeam"
-                                 IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"/>
+                                 BorderThickness="0"
+                                 Text="{Binding Email}"/>
                         <!--<TextBox Width="300"
                              FontSize="14"
                              Height="35"
                              
                              Text="{Binding Password}">
                     </TextBox>-->
-                    <TextBlock Text="Пароль"
+                    <TextBlock Text="Почта"
                                Foreground="#444"
                                Margin="10,0"
                                IsEnabled="True"
@@ -105,20 +103,21 @@
                                <!--Visibility="{Binding ElementName=pswd, Path=Password.IsEmpty, Converter={StaticResource InverseBoolToVisibilityConverter}}">-->
                         <TextBlock.Visibility>
                             <MultiBinding Converter="{StaticResource TextInputToVisibilityConverter}">
-                                <Binding Path="Password.IsEmpty"/>
+                                <Binding ElementName="pswd"  Path="Text.IsEmpty"/>
                                 <Binding ElementName="pswd"
                                          Path="IsFocused"/>
                             </MultiBinding>
                         </TextBlock.Visibility>
                     </TextBlock>
 
-                    <!--<Button HorizontalAlignment="Right"
+                    <Button HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Margin="0,0,5,0"
                             Height="20"
                             Width="20"
                             Background="Transparent"
                             BorderThickness="0"
+                            IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"
                             Command="{Binding ClearTextCommand}">
                         <Button.CommandParameter>
                             <system:Int32>1</system:Int32>
@@ -130,11 +129,11 @@
                                   Margin="0,2,0,0" />
                         </Button.Content>
                         <Button.Visibility>
-                            <Binding 
-                                     Path="Password.IsEmpty"
-                                     Converter="{StaticResource BoolToVisibilityConverter}" />
+                            <Binding ElementName="pswd"
+                                     Path="Text.IsEmpty"
+                                     Converter="{services:BoolToVisibilityConverter}" />
                         </Button.Visibility>
-                    </Button>-->
+                    </Button>
                 </Grid>
                 <!--CommandParameter="{Binding ElementName=pswd}"-->
                 <Button Height="35"
@@ -142,11 +141,10 @@
                         BorderThickness="0"
                         Foreground="White"
                         FontSize="15"
-                        Command="{Binding SigninCommand}"
-                        Cursor="Hand"
-                        IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}">
+                        Command="{Binding RegisterCommand}"
+                        Cursor="Hand">
                     <Button.Content>
-                        <TextBlock Text="Войти"
+                        <TextBlock Text="Зарегистрироваться"
                                    FontWeight="Bold" />
                     </Button.Content>
                     <Button.Background>
@@ -165,11 +163,12 @@
                 <TextBlock Foreground="White"
                            FontSize="14"
                            TextAlignment="Center">
-                    Нет аккаунта? 
+                    Есть аккаунт? 
                     <Hyperlink Cursor="Hand"
-                               Command="{Binding RegisterCommand}"
-                               IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}">
-                        Зарегистрироваться
+                               Command="{Binding SignInCommand}"
+                               IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsEnabled, UpdateSourceTrigger=PropertyChanged}"
+                               TextDecorations="{x:Null}">
+                        Войти
                     </Hyperlink>
                 </TextBlock>
             </StackPanel>

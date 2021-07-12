@@ -12,13 +12,26 @@ namespace Q.ViewModels
     class RegisterViewModel : BindableBase
     {
         private DelegateCommand _signInCommand;
-        public DelegateCommand SignInCommand => _signInCommand ??= new DelegateCommand(this.ChangePanel);
+        public DelegateCommand SignInCommand => _signInCommand ??= new DelegateCommand(() => this.ChangePanel(PageMoveType.Previous));
 
-        private void ChangePanel()
+        private void ChangePanel(PageMoveType pmt)
         {
-            TabMappingService.ChangeTab<LoginControl>(TabMappingService.GetVm<LoginViewModel>(), PageMoveType.Previous);
+            switch (pmt)
+            {
+                case PageMoveType.Previous:
+                    TabMappingService.ChangeTab<LoginControl>(TabMappingService.GetVm<LoginViewModel>(), pmt);
+                    break;
+                case PageMoveType.Next:
+                    TabMappingService.ChangeTab<KeyRegisterControl>(TabMappingService.GetVm<KeyRegisterViewModel>(), pmt);
+                    break;
+            }
+            
             //Cursors.IBeam
         }
+
+        private DelegateCommand _registerCommand;
+        public DelegateCommand RegisterCommand => _registerCommand ??= new DelegateCommand(() => this.ChangePanel(PageMoveType.Next));
+
 
         private string _email;
 

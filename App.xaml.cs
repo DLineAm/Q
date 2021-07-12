@@ -11,12 +11,16 @@ namespace Q
     /// </summary>
     public partial class App
     {
+        public static string NameTitle = "Q | ";
         public static MainWindowViewModel Vm = new MainWindowViewModel();
+
+
         protected override Window CreateShell()
         {
             var window = Container.Resolve<MainWindow>();
             TabMappingService.ChangeTab<LoginControl>(TabMappingService.GetVm<LoginViewModel>(), PageMoveType.None);
             window.DataContext = Vm;
+            WMS.RegisterWindow(Vm, window);
             return window;
         }
 

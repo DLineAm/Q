@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="Q.Views.ContentWindowTitleBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Q.Views"
+             xmlns:services="clr-namespace:Q.Services"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <services:InverseBoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <Style x:Key="TitleBarButton"
+               TargetType="Button">
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
+                    Value="True" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="IsTabStop"
+                    Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="titleBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                SnapsToDevicePixels="True"
+                                Opacity=".7">
+                            <ContentControl Content="{TemplateBinding Content}"
+                                            IsEnabled="{TemplateBinding IsEnabled}"
+                                            x:Name="ContentControl"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            Height="22"
+                                            Width="22"
+                                            Foreground="{TemplateBinding Foreground}"
+                                            Focusable="False">
+
+                            </ContentControl>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Button.IsMouseOver"
+                                     Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard TargetName="titleBorder"
+                                                    TargetProperty="Opacity">
+                                            <DoubleAnimation To="1"
+                                                             Duration="0:0:0.1"></DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard TargetName="titleBorder"
+                                                    TargetProperty="Opacity">
+                                            <DoubleAnimation To=".7"
+                                                             Duration="0:0:0.1"></DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="10,0">
+            <Button BorderThickness="0"
+                    Height="10"
+                    Width="10"
+                    Margin="5,0,5,0"
+                    Background="LimeGreen"
+                    IsTabStop="False"
+                    Style="{StaticResource TitleBarButton}"
+                    Command="{Binding MinimizeCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorLevel=2, AncestorType=UserControl}}">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius"
+                                Value="10"></Setter>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button BorderThickness="0"
+                    Height="10"
+                    Width="10"
+                    Background="Yellow"
+                    Margin="0,0,5,0"
+                    IsTabStop="False"
+                    Style="{StaticResource TitleBarButton}"
+                    Command="{Binding MaximizeCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorLevel=2, AncestorType=UserControl}}"
+                    Visibility="{Binding IsMaximize, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius"
+                                Value="10"></Setter>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            <Button BorderThickness="0"
+                    Height="10"
+                    Width="10"
+                    Background="Red"
+                    IsTabStop="False"
+                    Style="{StaticResource TitleBarButton}"
+                    Command="{Binding CloseCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorLevel=2, AncestorType=UserControl}}">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius"
+                                Value="10"></Setter>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+
+        <TextBlock Text="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorLevel=2, AncestorType=UserControl}}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="White"
+                   FontSize="12"></TextBlock>
+    </Grid>
+</UserControl>

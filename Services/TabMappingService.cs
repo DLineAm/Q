@@ -12,24 +12,30 @@ namespace Q.Services
 {
     public static class TabMappingService
     {
-        private static DispatcherTimer _changeTabTimer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromSeconds(0.6)};
-        private static readonly Dictionary<Type, Type> _registeredTabs = new Dictionary<Type, Type>();
+        private static readonly DispatcherTimer ChangeTabTimer = new DispatcherTimer(DispatcherPriority.Render) {Interval = TimeSpan.FromSeconds(0.6)};
+        private static readonly Dictionary<Type, Type> RegisteredTabs = new Dictionary<Type, Type>();
 
-        private static UserControl queueControl;
+        private static UserControl _queueControl;
 
-        private static LoginViewModel _loginViewModel;
+        private static readonly Lazy<LoginViewModel> LoginViewModel = new Lazy<LoginViewModel>();
 
-        private static RegisterViewModel _registerViewModel;
+        private static readonly Lazy<KeyRegisterViewModel> KeyRegisterViewModel = new Lazy<KeyRegisterViewModel>();
+
+        //private static LoginViewModel _loginViewModel;
+
+        private static readonly Lazy<RegisterViewModel> RegisterViewModel = new Lazy<RegisterViewModel>();
+
+        //private static RegisterViewModel _registerViewModel;
 
         static TabMappingService()
         {
-            _changeTabTimer.Tick += (s, e) =>
+            ChangeTabTimer.Tick += (s, e) =>
             {
-                var a = queueControl;
+                var a = _queueControl;
                 App.Vm.CurrentView = a;
                 App.Vm.PageMoveType = PageMoveType.None;
                 App.Vm.IsEnabled = true;
-                _changeTabTimer.Stop();
+                ChangeTabTimer.Stop();
                 //_changeTabTimer = new DispatcherTimer{Interval = TimeSpan.FromSeconds(1)};
                 //_changeTabTimer
             };
@@ -37,14 +43,14 @@ namespace Q.Services
 
         public static void RegisterTab<TWin, TVm>() where TWin : UserControl where  TVm : BindableBase
         {
-            _registeredTabs[typeof(TWin)] = typeof(TVm);
+            RegisteredTabs[typeof(TWin)] = typeof(TVm);
         }
 
         public static void ChangeTab<TWin>(BindableBase vm, PageMoveType pmt) where TWin : UserControl
         {
             var tab = (UserControl)Activator.CreateInstance(typeof(TWin));
             tab.DataContext = vm;
-            queueControl = tab;
+            _queueControl = tab;
             switch (pmt)
             {
                 case PageMoveType.Previous:
@@ -63,7 +69,7 @@ namespace Q.Services
             App.Vm.PageMoveType = pmt;
             if (pmt != PageMoveType.None)
             {
-                _changeTabTimer.Start();
+                ChangeTabTimer.Start();
                 return;
             }
 
@@ -74,8 +80,9 @@ namespace Q.Services
         {
             return typeof(T) switch
             {
-                { } loginType when loginType == typeof(LoginViewModel) => _loginViewModel ??= new LoginViewModel(),
-                { } registerType when registerType == typeof(RegisterViewModel) => _registerViewModel ??= new RegisterViewModel(),
+                { } loginType when loginType == typeof(LoginViewModel) => LoginViewModel.Value,
+                { } registerType when registerType == typeof(RegisterViewModel) => RegisterViewModel.Value,
+                { } keyRegType when keyRegType == typeof(KeyRegisterViewModel) => KeyRegisterViewModel.Value,
                 _ => null
             };
         } 

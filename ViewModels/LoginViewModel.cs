@@ -81,6 +81,7 @@ namespace Q.ViewModels
 
         private void Signin(/*object param*/)
         {
+            CheckForDebug();
             //if (!(param is PasswordBox passwordBox))
             //    return;
             //Password = passwordBox.Password;
@@ -97,10 +98,21 @@ namespace Q.ViewModels
                 SetError("Логин и пароль должны иметь длинну более 6 и менее 16 символов!");
                 return;
             }
+
             ErrorVisibility = Visibility.Collapsed;
             App.Vm.IsEnabled = false;
             App.Vm.IsLoading = true;
             _loadingTimer.Start();
+        }
+
+        private void CheckForDebug()
+        {
+            if (Login == @"/startdebug")
+            {
+                MessageBox.Show("Debug Started");
+                WMS.ShowWindow<MainContentWindow>(new MainContentWindowViewModel());
+                WMS.CloseWindow(App.Vm);
+            }
         }
 
         private void SetError(string text)

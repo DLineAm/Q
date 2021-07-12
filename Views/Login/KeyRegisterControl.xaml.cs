@@ -14,19 +14,13 @@ using System.Windows.Shapes;
 namespace Q.Views
 {
     /// <summary>
-    /// Логика взаимодействия для LoginControl.xaml
+    /// Логика взаимодействия для KeyRegisterControl.xaml
     /// </summary>
-    public partial class LoginControl : UserControl
+    public partial class KeyRegisterControl : UserControl
     {
-        public LoginControl()
+        public KeyRegisterControl()
         {
             InitializeComponent();
-        }
-
-        private void PswdChanged(object sender, RoutedEventArgs e)
-        {
-            if (this.DataContext != null)
-                ((dynamic) this.DataContext).Password = ((PasswordBox) sender).Password;
         }
     }
 }
