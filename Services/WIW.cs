@@ -23,7 +23,7 @@ namespace Q.Services
 
         private static readonly Dictionary<UserControl, ContentWindow> _windowMapping = new Dictionary<UserControl, ContentWindow>();
 
-        public delegate void SketchHandler(string message);
+        public delegate void SketchHandler(Type type);
 
         public static event SketchHandler ChangeListEvent;
 
@@ -67,7 +67,7 @@ namespace Q.Services
 
             if (window.MaximizePanel.Children.Count == 0) window.MaximizePanel.Visibility = Visibility.Collapsed;
 
-            ChangeListEvent.Invoke("");
+            ChangeListEvent.Invoke(content.GetType());
         }
 
         public static void ShowWindow<TVm>(MainContentWindow window, UserControl content, double height, double width, string title = "", string iconName = "") where TVm : new()
@@ -103,10 +103,41 @@ namespace Q.Services
                 iconName == "" ? "Bug" : iconName);
         }
 
-        public static void CloseWindow(MainContentWindow window, UserControl content)
+        public static void CloseWindow(UserControl content)
         {
+            //if(content == null) return;
             if (!_windowMapping.TryGetValue(content, out var value))
                 throw new InvalidOperationException("UI for this UserContext is not displayed");
+
+            var parent = VisualTreeHelper.GetParent(value) as Panel;
+
+            parent.Children.Remove(value);
+
+            //window.WindowCanvas.Children.Remove(value);
+            _windowMapping.Remove(content);
+
+            ChangeListEvent.Invoke(content.GetType());
+
+            value = null;
+            content = null;
+        }
+
+        public static void CloseWindow(int index, Type ucType)
+        {
+            if (_windowMapping.Count - 1 < index)
+                throw new InvalidOperationException("UI for this UserContext is not displayed");
+
+            var list = _windowMapping.Select(p => p.Key)
+                .Where(p => p.GetType() == ucType)
+                .ToList();
+
+            if(list.Count == -1) return;
+
+            var content = list[index];
+
+            _windowMapping.TryGetValue(list[index], out var value);
+            //var content = pair.Key;
+            //var value = pair.Value;
 
             var parent = VisualTreeHelper.GetParent(value) as Panel;
 
@@ -118,7 +149,7 @@ namespace Q.Services
             value = null;
             content = null;
 
-            ChangeListEvent.Invoke("");
+            ChangeListEvent.Invoke(ucType);
         }
 
         public static void Minimize(UserControl content)
@@ -244,6 +275,21 @@ namespace Q.Services
             return result;
         }
 
+        public static List<WindowSketch> GetListOfWindowSketches(Type type)
+        {
+            var result = (from items in _windowMapping
+                where items.Key.GetType() == type
+                select new WindowSketch
+                {
+                    Name = items.Value.Bar.Title,
+                    Type = type,
+                    Sketch = new VisualBrush(items.Value),
+                    ContentSketch = new VisualBrush(items.Key)
+                }).ToList();
+
+            return result;
+        }
+
         public static void InfoToJson()
         {
             var list = _windowMapping.Select(items => new WindowInfo
@@ -316,7 +362,7 @@ namespace Q.Services
                 //Canvas.SetZIndex(window.WindowPanel, 1);
             }
 
-            ChangeListEvent.Invoke("");
+            //ChangeListEvent.Invoke("");
 
             return true;
         }

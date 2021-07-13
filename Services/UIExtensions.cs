@@ -16,5 +16,18 @@ namespace Q.Services
         {
             return (string)element.GetValue(CustomTitleProperty);
         }
+
+        public static readonly DependencyProperty MultipleWindowsProperty = DependencyProperty.RegisterAttached(
+            "MultipleWindows", typeof(bool), typeof(UIExtensions), new PropertyMetadata(true));
+
+        public static void SetMultipleWindows(DependencyObject element, bool value)
+        {
+            element.SetValue(MultipleWindowsProperty, value);
+        }
+
+        public static bool GetMultipleWindows(DependencyObject element)
+        {
+            return (bool)element.GetValue(MultipleWindowsProperty);
+        }
     }
 }

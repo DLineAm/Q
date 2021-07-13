@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
@@ -34,9 +35,9 @@ namespace Q.Views
 
         public static void Subscribe()
         {
-            WIW.ChangeListEvent += m =>
+            WIW.ChangeListEvent += m=>
             {
-                ((MainContentWindowViewModel) Instance.DataContext).Sketches = WIW.GetListOfWindowSketches<LoginControl>();
+                ((MainContentWindowViewModel) Instance.DataContext).Sketches = WIW.GetListOfWindowSketches(m);
             };
         }
 
@@ -100,6 +101,16 @@ namespace Q.Views
         {
             MainBorder.CornerRadius = new CornerRadius(this.WindowState == WindowState.Maximized ? 0 : 6);
             MainBorder.BorderThickness = new Thickness(this.WindowState == WindowState.Maximized ? 7 : 1);
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            var context = btn?.DataContext as WindowSketch;
+            var index = SketchProvider.GetIndexOfSketchList(context);
+            if(index == -1) return;
+
+            WIW.CloseWindow(index, context.Type);
         }
     }
 }

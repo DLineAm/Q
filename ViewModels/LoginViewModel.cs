@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -113,13 +114,14 @@ namespace Q.ViewModels
                 var vm = new MainContentWindowViewModel(true);
                 WMS.ShowWindow<MainContentWindow>(vm);
                 vm.Subscribe();
-                //ISketchIcon<RegisterControl> icon = new SketchIcon<RegisterControl> { Name = "Тестирование" };
-                //IMS.SetActionClick(icon);
-                //IMS.TryAddIcon(icon, "Bug");
-                FormInitializeNotificator.Invoke();
+                IMS.FastAddIcon<RegisterControl, RegisterViewModel>("Регистер");
+                IMS.FastAddIcon<LoginControl, LoginViewModel>("Логин", false);
+                //FormInitializeNotificator.Invoke();
                 WMS.CloseWindow(App.Vm);
             }
         }
+
+        
 
         private void SetError(string text)
         {

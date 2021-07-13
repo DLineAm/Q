@@ -33,7 +33,7 @@ namespace Q.Views
 
         public void Close()
         {
-            WIW.CloseWindow(MainContentWindow.Instance, (UserControl)this.ContentControl.Content);
+            WIW.CloseWindow((UserControl)this.ContentControl.Content);
         }
 
         public void Minimize()

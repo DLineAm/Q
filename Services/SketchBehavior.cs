@@ -1,13 +1,15 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Xaml.Behaviors;
+using Q.ViewModels;
 using Q.Views;
 
 namespace Q.Services
 {
-    public class SketchBehavior : Behavior<UIElement>
+    public class SketchBehavior<T> : Behavior<UIElement> where T : UserControl
     {
         private Canvas canvas;
 
@@ -64,6 +66,14 @@ namespace Q.Services
             if(point.X > panel.ActualWidth || point.X < 0 ||
                point.Y > panel.ActualHeight || point.Y < 0)
                 return;
+
+            //var btn = (Button) AssociatedObject;
+
+            if (MainContentWindowViewModel.Instance.SketchType != typeof(T).Name)
+            {
+                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches<T>();
+                MainContentWindowViewModel.Instance.SketchType = typeof(T).Name;
+            }
 
             // Move the element.
             Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, point.X - mouseOffset.X);

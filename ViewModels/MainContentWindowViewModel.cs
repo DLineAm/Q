@@ -14,17 +14,22 @@ namespace Q.ViewModels
         public MainContentWindowViewModel(bool isDebug)
         {
             Sketches = WIW.GetListOfWindowSketches<LoginControl>();
+            SketchType = nameof(LoginControl);
             if (isDebug){}
+
+            Instance = this;
         }
+
+        public static MainContentWindowViewModel Instance { get; private set; }
 
         public void Subscribe()
         {
-            FormInitializeNotificator.Subscribe(() =>
-            {
-                ISketchIcon<LoginControl> icon = new SketchIcon<LoginControl> { Name = "Тестирование" };
-                IMS.SetActionClick(icon);
-                IMS.TryAddIcon(icon, "Bug");
-            });
+            //FormInitializeNotificator.Subscribe(() =>
+            //{
+            //    ISketchIcon<LoginControl> icon = new SketchIcon<LoginControl> { Name = "Тестирование" };
+            //    IMS.SetActionClick(icon);
+            //    IMS.TryAddIcon(icon, "Bug");
+            //});
         }
 
         private string _title = App.NameTitle + "Главная форма";
@@ -40,5 +45,7 @@ namespace Q.ViewModels
             get => _sketches;
             set => SetProperty(ref _sketches, value);
         }
+
+        public string SketchType;
     }
 }

@@ -15,34 +15,45 @@ namespace Q.Services
 {
     public static class IMS
     {
-        private static readonly List<ISketchIcon<object>> IconsMapping = new List<ISketchIcon<object>>();
+        private static readonly Dictionary<ISketchIcon<object>, Button> IconsMapping = new Dictionary<ISketchIcon<object>, Button>();
 
-        public static bool TryAddIcon<T>(ISketchIcon<T> icon, string iconName)
+        public static void FastAddIcon<TUc, TVm>(string title, bool multipleWindows = true, string iconName = "") where TUc : UserControl where TVm : class, new()
         {
-            //Console.WriteLine(icon.VmType.Name);
-            //MessageBox.Show(icon.VmType.Name);
+            ISketchIcon<TUc> icon = new SketchIcon<TUc> { Name = title };
+            if(!TryAddIcon(icon, iconName == "" ? "Bug" : iconName, multipleWindows)) return;
+            SetActionClick<TUc, TVm>(icon);
+            AddBehavior(new SketchBehavior<TUc>(), (SketchIcon<TUc>)icon);
+        }
+
+        public static bool TryAddIcon<TUc>(ISketchIcon<TUc> icon, string iconName, bool multipleWindows = true)
+        {
             var name = icon.VmType.Name;
-            if (IconsMapping.Count != 0 && IconsMapping.Select(item => item.ToType<T>()).Any(i => i?.VmType?.Name == name))
+            if (IconsMapping.Count != 0 && IconsMapping.Select(item => item.Key.ToType<TUc>()).Any(i => i?.VmType?.Name == name))
             {
                 return false;
             }
-            //_iconsMapping.ForEach(p => MessageBox.Show(p.ToType<T>()?.Name));
-            //if (_iconsMapping.Any(p => p.ToType<T>()?.Name == name))
-            //    return false;
 
-            var btn = GetButton(iconName, icon);
+            var btn = GetButton(iconName, icon, multipleWindows);
 
             if (btn == null) return false;
 
             MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
-            var behaviors = Interaction.GetBehaviors(btn);
-            behaviors.Add(new SketchBehavior());
-            IconsMapping.Add((ISketchIcon<object>)icon);
+           
+            IconsMapping[(ISketchIcon<object>)icon] = btn;
 
             return true;
         }
 
-        private static Button GetButton<T>(string iconName, ISketchIcon<T> icon)
+        public static void AddBehavior<T>(SketchBehavior<T> behavior, SketchIcon<T> icon) where T : UserControl
+        {
+            if (!IconsMapping.TryGetValue(icon, out var btn))
+                throw new InvalidOperationException("UI for this Sketch is not displayed!");
+
+            var behaviors = Interaction.GetBehaviors(btn);
+            behaviors.Add(new SketchBehavior<T>());
+        }
+
+        private static Button GetButton<T>(string iconName, ISketchIcon<T> icon, bool multipleWindows)
         {
             var btn = new Button
             {
@@ -50,6 +61,8 @@ namespace Q.Services
                 BorderThickness = new Thickness(0),
                 Margin = new Thickness(0)
             };
+
+            UIExtensions.SetMultipleWindows(btn, multipleWindows);
 
             var vb = new Viewbox
             {
@@ -73,8 +86,10 @@ namespace Q.Services
                 cvs2.Children.Add(path);
 
                 btn.Content = vb;
-                btn.Click += (s,e) =>
+                btn.Click += (s, e) =>
+                {
                     icon.ClickAction();
+                };
 
                 UIExtensions.SetCustomTitle(btn, icon.Name);
             }
@@ -83,27 +98,34 @@ namespace Q.Services
                 Debug.WriteLine(e.Message);
                 return null;
             }
-            
 
             return btn;
-
-            //    <Viewbox Stretch="Uniform"
-            //Width="50"
-            //Height="50">
-            //    <Canvas Width="90"
-            //Height="90">
-
-            //    <Canvas>
         }
 
-        public static void SetActionClick<T>(ISketchIcon<T> icon) where T : UserControl
+        public static void SetActionClick<TUc, TVm>(ISketchIcon<TUc> icon) where TUc : UserControl where TVm : class, new()
         {
             icon.ClickAction = () =>
             {
-                //var btn = (Button) sender;
-                var uc = (UserControl)Activator.CreateInstance<T>();
-                uc.DataContext = new RegisterViewModel();
+                //Проверка на возможность запуска нескольких окон
+                if (!IconsMapping.TryGetValue(icon, out var btn))
+                    throw new InvalidOperationException("UI for this SketchIcon is not displayed!");
+
+                //Если такой возможности нет - не даем запустить больше одного окна
+                if (!UIExtensions.GetMultipleWindows(btn))
+                {
+                    var list = WIW.GetListOfWindowSketches<TUc>();
+
+                    if(list.Count != 0) return;
+                }
+
+                //Создаем каркасный элемент и добавляем туда DataContext
+                var uc = (UserControl)Activator.CreateInstance<TUc>();
+                uc.DataContext = Activator.CreateInstance<TVm>();
+
                 WIW.ShowWindow(MainContentWindow.Instance, uc, 400, 600, icon.Name);
+
+                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches<TUc>();
+                MainContentWindowViewModel.Instance.SketchType = typeof(TUc).Name;
             };
         }
     }
