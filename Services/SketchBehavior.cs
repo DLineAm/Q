@@ -38,9 +38,9 @@ namespace Q.Services
         private bool isDragging = false;
 
         // Запись точной позиции, в которой нажата кнопка
-        private Point mouseOffset = new Point(35,0);
+        private Point mouseOffset = new Point(85,0);
 
-        private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void AssociatedObject_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
             // Поиск canvas
             canvas ??= VisualTreeHelper.GetParent(this.AssociatedObject) as Canvas;
@@ -66,7 +66,9 @@ namespace Q.Services
                 return;
 
             // Move the element.
-            MainContentWindow.Instance.SketchBorder.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);
+            Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, point.X - mouseOffset.X);
+            
+            //MainContentWindow.Instance.SketchBorder.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);
             //AssociatedObject.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);
         }
 

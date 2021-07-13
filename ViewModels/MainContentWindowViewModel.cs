@@ -11,9 +11,20 @@ namespace Q.ViewModels
 {
     public class MainContentWindowViewModel : BindableBase
     {
-        public MainContentWindowViewModel()
+        public MainContentWindowViewModel(bool isDebug)
         {
             Sketches = WIW.GetListOfWindowSketches<LoginControl>();
+            if (isDebug){}
+        }
+
+        public void Subscribe()
+        {
+            FormInitializeNotificator.Subscribe(() =>
+            {
+                ISketchIcon<LoginControl> icon = new SketchIcon<LoginControl> { Name = "Тестирование" };
+                IMS.SetActionClick(icon);
+                IMS.TryAddIcon(icon, "Bug");
+            });
         }
 
         private string _title = App.NameTitle + "Главная форма";

@@ -12,28 +12,12 @@ namespace Q.ViewModels
         //private Visibility _windowVisibility = Visibility.Visible;
         //public Visibility WindowVisibility { get => _windowVisibility; set => SetProperty(ref _windowVisibility, value); }
 
-        private int _canvasX;
+        private string _title;
 
-        public int CanvasX
+        public string Title
         {
-            get => _canvasX;
-            set => SetProperty(ref _canvasX, value);
-        }
-
-        private int _canvasY;
-
-        public int CanvasY
-        {
-            get => _canvasY;
-            set => SetProperty(ref _canvasY, value);
-        }
-
-        private int _canvasZ;
-
-        public int CanvasZ
-        {
-            get => _canvasZ;
-            set => SetProperty(ref _canvasZ, value);
+            get => _title;
+            set => SetProperty(ref _title, value);
         }
 
         private void SetProperty<T>(ref T source, T value, [CallerMemberName] string propertyName = "")

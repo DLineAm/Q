@@ -109,8 +109,14 @@ namespace Q.ViewModels
         {
             if (Login == @"/startdebug")
             {
-                MessageBox.Show("Debug Started");
-                WMS.ShowWindow<MainContentWindow>(new MainContentWindowViewModel());
+                //MessageBox.Show("Debug Started");
+                var vm = new MainContentWindowViewModel(true);
+                WMS.ShowWindow<MainContentWindow>(vm);
+                vm.Subscribe();
+                //ISketchIcon<RegisterControl> icon = new SketchIcon<RegisterControl> { Name = "Тестирование" };
+                //IMS.SetActionClick(icon);
+                //IMS.TryAddIcon(icon, "Bug");
+                FormInitializeNotificator.Invoke();
                 WMS.CloseWindow(App.Vm);
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,7 @@ namespace Q.Views
         public double BackupWidth;
 
         public WindowState WindowState = WindowState.Normal;
+
 
         public void Close()
         {

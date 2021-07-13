@@ -42,8 +42,18 @@ namespace Q.Views
         }
 
         public static readonly DependencyProperty IsMaximizeProperty =
-            DependencyProperty.Register("IsMaximizeEnabled", typeof(bool), typeof(TitleBar)
+            DependencyProperty.Register("IsMaximizeEnabled", typeof(bool), typeof(ContentWindowTitleBar)
                 , new PropertyMetadata(true));
+
+        public string Title
+        {
+            get => (string)GetValue(TitleProperty);
+            set => SetValue(TitleProperty, value);
+        }
+
+        public static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register("Title", typeof(string), typeof(ContentWindowTitleBar)
+                , new PropertyMetadata(""));
 
         private void Maximize(IView view)
         {

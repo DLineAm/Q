@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+
+using Newtonsoft.Json;
 
 using Q.Models;
 using Q.ViewModels;
@@ -36,7 +39,7 @@ namespace Q.Services
             _windowMapping[content] = wiw;
         }
 
-        public static void ShowWindow(MainContentWindow window, UserControl content, double height, double width)
+        public static void ShowWindow(MainContentWindow window, UserControl content, double height, double width, string title = "", string iconName = "")
         {
             var wiw = new ContentWindow
             {
@@ -46,6 +49,10 @@ namespace Q.Services
                 BackupHeight = height,
                 BackupWidth = width
             };
+
+            wiw.Bar.Title = title == "" 
+                ? ((UserControl) wiw.ContentControl.Content).GetType().FullName 
+                : title;
 
             window.NormalPanel.Children.Add(wiw);
             _windowMapping[content] = wiw;
@@ -63,6 +70,39 @@ namespace Q.Services
             ChangeListEvent.Invoke("");
         }
 
+        public static void ShowWindow<TVm>(MainContentWindow window, UserControl content, double height, double width, string title = "", string iconName = "") where TVm : new()
+        {
+           ShowWindow(window, content, height, width, title, iconName);
+           ISketchIcon<object> icon = new SketchIcon<object>()
+           {
+               Name = title, ClickAction = () =>
+               {
+                   //var btn = (Button) sender;
+                   content.DataContext = Activator.CreateInstance<TVm>();;
+                   ShowWindow(MainContentWindow.Instance, content, 400, 600, title);
+               }
+           };
+           IMS.TryAddIcon(icon,
+               iconName == "" ? "Bug" : iconName);
+        }
+
+        public static void ShowWindow<TVm, TUc>(MainContentWindow window, double height, double width, string title = "", string iconName = "") where TVm : new() where TUc : UserControl
+        {
+            var uc = (UserControl) Activator.CreateInstance<TUc>();
+            ShowWindow(window, uc, height, width, title, iconName);
+            ISketchIcon<object> icon = new SketchIcon<object>()
+            {
+                Name = title, ClickAction = () =>
+                {
+                    //var btn = (Button) sender;
+                    uc.DataContext = Activator.CreateInstance<TVm>();;
+                    ShowWindow(MainContentWindow.Instance, uc, 400, 600, title);
+                }
+            };
+            IMS.TryAddIcon(icon,
+                iconName == "" ? "Bug" : iconName);
+        }
+
         public static void CloseWindow(MainContentWindow window, UserControl content)
         {
             if (!_windowMapping.TryGetValue(content, out var value))
@@ -74,6 +114,10 @@ namespace Q.Services
 
             //window.WindowCanvas.Children.Remove(value);
             _windowMapping.Remove(content);
+
+            value = null;
+            content = null;
+
             ChangeListEvent.Invoke("");
         }
 
@@ -88,7 +132,7 @@ namespace Q.Services
                 value.WindowState = WindowState.Normal;
                 return;
             }
-                
+
             value.Visibility = Visibility.Collapsed;
             value.WindowState = WindowState.Minimized;
         }
@@ -156,9 +200,10 @@ namespace Q.Services
                     value.Height = Double.NaN;
                     window.NormalPanel.Children.Remove(value);
                     window.WindowPanel.Children.Remove(value);
+                    window.MaximizePanel.Children.Remove(value);
                     window.MaximizePanel.Children.Add(value);
                     Canvas.SetZIndex(window.MaximizePanel, 10);
-                    Canvas.SetZIndex(window.WindowPanel, 1);
+                    Canvas.SetZIndex(window.NormalPanel, 1);
                     value.WindowState = WindowState.Maximized;
                     window.MaximizePanel.Visibility = window.MaximizePanel.Children.Count == 0
                         ? Visibility.Collapsed
@@ -171,9 +216,10 @@ namespace Q.Services
                     value.Height = value.BackupHeight;
                     window.WindowPanel.Children.Remove(value);
                     window.MaximizePanel.Children.Remove(value);
+                    window.NormalPanel.Children.Remove(value);
                     window.NormalPanel.Children.Add(value);
                     Canvas.SetZIndex(window.MaximizePanel, 1);
-                    Canvas.SetZIndex(window.WindowPanel, 10);
+                    Canvas.SetZIndex(window.NormalPanel, 10);
                     value.WindowState = WindowState.Normal;
                     window.MaximizePanel.Visibility = window.MaximizePanel.Children.Count == 0
                         ? Visibility.Collapsed
@@ -187,9 +233,104 @@ namespace Q.Services
         {
             var result = (from items in _windowMapping
                           where items.Key.GetType() == typeof(T)
-                          select new WindowSketch { Name = items.Key.GetType().Name, Type = typeof(T), Sketch = new VisualBrush(items.Value) }).ToList();
+                          select new WindowSketch
+                          {
+                              Name = items.Value.Bar.Title,
+                              Type = typeof(T),
+                              Sketch = new VisualBrush(items.Value),
+                              ContentSketch = new VisualBrush(items.Key)
+                          }).ToList();
 
             return result;
+        }
+
+        public static void InfoToJson()
+        {
+            var list = _windowMapping.Select(items => new WindowInfo
+            {
+                ContentName = items.Key.GetType().FullName,
+                Title = items.Value.Bar.Title,
+                Width = items.Value.BackupWidth,
+                Height = items.Value.BackupHeight,
+                CanvasX = Canvas.GetLeft(items.Value),
+                CanvasY = Canvas.GetTop(items.Value),
+                CanvasZ = Canvas.GetZIndex(items.Value),
+                Parent = (VisualTreeHelper.GetParent(items.Value) as Panel).Name,
+                State = items.Value.WindowState
+            })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(list);
+
+            //var stream = File.Create(Directory.GetCurrentDirectory() + @"\windowsinfo.json");
+
+            File.WriteAllText(Directory.GetCurrentDirectory() + @"\windowsinfo.json", json);
+        }
+
+        public static bool TryInitializeJson()
+        {
+            var path = Directory.GetCurrentDirectory() + @"\windowsinfo.json";
+            //var dinfo = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\windowsinfo.json");
+            if (!File.Exists(path)) return false;
+            var json = File.ReadAllText(path);
+            var list = JsonConvert.DeserializeObject<List<WindowInfo>>(json);
+            if (list.Count == 0) return false;
+            foreach (var item in list)
+            {
+                var wiw = new ContentWindow
+                {
+                    ContentControl = { Content = CreateContentControl(item.ContentName) },
+                    Height = Double.IsNaN(item.Height) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Height,
+                    Width = Double.IsNaN(item.Width) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Width,
+                    BackupHeight = item.Height,
+                    BackupWidth = item.Width,
+                    WindowState = item.State,
+                    DataContext = new ContentWindowViewModel { Title = item.ContentName },
+                    Bar = {Title = item.Title}
+
+                };
+
+                switch (item.Parent)
+                {
+                    case nameof(MainContentWindow.NormalPanel):
+                        MainContentWindow.Instance.NormalPanel.Children.Add(wiw);
+                        SetPosition(wiw, item);
+                        break;
+                    case nameof(MainContentWindow.MaximizePanel):
+                        MainContentWindow.Instance.MaximizePanel.Children.Add(wiw);
+                        break;
+                    case nameof(MainContentWindow.WindowPanel):
+                        MainContentWindow.Instance.WindowPanel.Children.Add(wiw);
+                        SetPosition(wiw, item);
+                        break;
+                }
+
+                _windowMapping[(UserControl)wiw.ContentControl.Content] = wiw;
+
+                Canvas.SetZIndex(wiw, (int)item.CanvasZ);
+
+                if(item.CanvasZ > 1) ChangeTopMost((UserControl)wiw.ContentControl.Content);
+
+                //Canvas.SetZIndex(window.MaximizePanel, 1);
+
+                //Canvas.SetZIndex(window.WindowPanel, 1);
+            }
+
+            ChangeListEvent.Invoke("");
+
+            return true;
+        }
+
+        private static UserControl CreateContentControl(string typeName)
+        {
+            var type = Type.GetType(typeName);
+            return (UserControl)Activator.CreateInstance(type);
+        }
+
+        private static void SetPosition(UserControl wiw, WindowInfo source)
+        {
+            Canvas.SetLeft(wiw, source.CanvasX);
+            Canvas.SetTop(wiw, source.CanvasY);
         }
     }
 }

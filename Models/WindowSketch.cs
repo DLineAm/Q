@@ -10,5 +10,7 @@ namespace Q.Models
         public Type Type { get; set; }
 
         public VisualBrush Sketch { get; set; }
+
+        public VisualBrush ContentSketch { get; set; }
     }
 }

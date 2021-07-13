@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,6 +22,15 @@ namespace Q.Views
             //WIW.Subscribe(this);
             Instance = this;
         }
+
+        public void InvokeInitializeEvent()
+        {
+            InitializeEvent.Invoke();
+        }
+
+        public delegate void InitializeHandler();
+
+        public event InitializeHandler InitializeEvent;
 
         public static void Subscribe()
         {
@@ -55,11 +66,12 @@ namespace Q.Views
             //App.ChangeBorders(7);
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            var uc = new LoginControl{DataContext = new LoginViewModel()};
-            WIW.ShowWindow(this, uc, 400, 600);
-        }
+        //private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        //{
+        //    var btn = (Button) sender;
+        //    var uc = new RegisterControl(){DataContext = new RegisterViewModel()};
+        //    WIW.ShowWindow(this, uc, 400, 600, UIExtensions.GetCustomTitle(btn));
+        //}
 
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -72,6 +84,22 @@ namespace Q.Views
                 WIW.ChangeTopMost(content);
                 //SketchBorder.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void MainContentWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            WIW.InfoToJson();
+        }
+
+        private void MainContentWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if(!WIW.TryInitializeJson()) return;
+        }
+
+        private void MainContentWindow_OnStateChanged(object? sender, EventArgs e)
+        {
+            MainBorder.CornerRadius = new CornerRadius(this.WindowState == WindowState.Maximized ? 0 : 6);
+            MainBorder.BorderThickness = new Thickness(this.WindowState == WindowState.Maximized ? 7 : 1);
         }
     }
 }
