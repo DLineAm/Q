@@ -24,22 +24,13 @@ namespace Q.Views
             Instance = this;
         }
 
-        public void InvokeInitializeEvent()
-        {
-            InitializeEvent.Invoke();
-        }
-
-        public delegate void InitializeHandler();
-
-        public event InitializeHandler InitializeEvent;
-
-        public static void Subscribe()
-        {
-            WIW.ChangeListEvent += m=>
-            {
-                ((MainContentWindowViewModel) Instance.DataContext).Sketches = WIW.GetListOfWindowSketches(m);
-            };
-        }
+        //public static void Subscribe()
+        //{
+        //    WIW.ChangeListEvent += m=>
+        //    {
+        //        ((MainContentWindowViewModel) Instance.DataContext).Sketches = WIW.GetListOfWindowSketches(m);
+        //    };
+        //}
 
         public static MainContentWindow Instance { get; private set; }
 

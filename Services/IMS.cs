@@ -134,7 +134,7 @@ namespace Q.Services
                 var uc = (UserControl)Activator.CreateInstance<TUc>();
                 uc.DataContext = Activator.CreateInstance<TVm>();
 
-                WIW.ShowWindow(MainContentWindow.Instance, uc, 400, 600, icon.Name);
+                WIW.ShowWindow( uc, 400, 600, icon.Name);
 
                 MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches<TUc>();
                 MainContentWindowViewModel.Instance.SketchType = typeof(TUc).Name;

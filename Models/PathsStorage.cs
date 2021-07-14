@@ -38,7 +38,7 @@ namespace Q.Models
 
         public static List<PathWithExtensions> GetPath(string name)
         {
-            return Paths.FindAll(p => p.Name.Contains(name)).Select(p => Clone(p)).ToList();
+            return Paths.FindAll(p => p.Name.Contains(name)).Select(Clone).ToList();
         }
 
         private static PathWithExtensions Clone(PathWithExtensions parent)

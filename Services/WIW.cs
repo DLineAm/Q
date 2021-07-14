@@ -16,10 +16,7 @@ namespace Q.Services
 {
     public static class WIW
     {
-        static WIW()
-        {
-            MainContentWindow.Subscribe();
-        }
+        static WIW(){ }
 
         private static readonly Dictionary<UserControl, ContentWindow> _windowMapping = new Dictionary<UserControl, ContentWindow>();
 
@@ -39,8 +36,9 @@ namespace Q.Services
             _windowMapping[content] = wiw;
         }
 
-        public static void ShowWindow(MainContentWindow window, UserControl content, double height, double width, string title = "", string iconName = "")
+        public static void ShowWindow(UserControl content, double height, double width, string title = "", string iconName = "")
         {
+            var instance = MainContentWindow.Instance;
             var wiw = new ContentWindow
             {
                 ContentControl = { Content = content },
@@ -54,32 +52,32 @@ namespace Q.Services
                 ? ((UserControl) wiw.ContentControl.Content).GetType().FullName 
                 : title;
 
-            window.NormalPanel.Children.Add(wiw);
+            instance.NormalPanel.Children.Add(wiw);
             _windowMapping[content] = wiw;
 
-            Canvas.SetZIndex(window.MaximizePanel, 1);
+            Canvas.SetZIndex(instance.MaximizePanel, 1);
 
-            Canvas.SetZIndex(window.WindowPanel, 1);
+            Canvas.SetZIndex(instance.WindowPanel, 1);
 
-            Canvas.SetZIndex(window.NormalPanel, 10);
+            Canvas.SetZIndex(instance.NormalPanel, 10);
 
             ChangeTopMost(content);
 
-            if (window.MaximizePanel.Children.Count == 0) window.MaximizePanel.Visibility = Visibility.Collapsed;
+            if (instance.MaximizePanel.Children.Count == 0) instance.MaximizePanel.Visibility = Visibility.Collapsed;
 
             ChangeListEvent.Invoke(content.GetType());
         }
 
-        public static void ShowWindow<TVm>(MainContentWindow window, UserControl content, double height, double width, string title = "", string iconName = "") where TVm : new()
+        public static void ShowWindow<TVm>(UserControl content, double height, double width, string title = "", string iconName = "") where TVm : new()
         {
-           ShowWindow(window, content, height, width, title, iconName);
+           ShowWindow(content, height, width, title, iconName);
            ISketchIcon<object> icon = new SketchIcon<object>()
            {
                Name = title, ClickAction = () =>
                {
                    //var btn = (Button) sender;
                    content.DataContext = Activator.CreateInstance<TVm>();;
-                   ShowWindow(MainContentWindow.Instance, content, 400, 600, title);
+                   ShowWindow(content, 400, 600, title);
                }
            };
            IMS.TryAddIcon(icon,
@@ -89,14 +87,14 @@ namespace Q.Services
         public static void ShowWindow<TVm, TUc>(MainContentWindow window, double height, double width, string title = "", string iconName = "") where TVm : new() where TUc : UserControl
         {
             var uc = (UserControl) Activator.CreateInstance<TUc>();
-            ShowWindow(window, uc, height, width, title, iconName);
+            ShowWindow(uc, height, width, title, iconName);
             ISketchIcon<object> icon = new SketchIcon<object>()
             {
                 Name = title, ClickAction = () =>
                 {
                     //var btn = (Button) sender;
                     uc.DataContext = Activator.CreateInstance<TVm>();;
-                    ShowWindow(MainContentWindow.Instance, uc, 400, 600, title);
+                    ShowWindow( uc, 400, 600, title);
                 }
             };
             IMS.TryAddIcon(icon,

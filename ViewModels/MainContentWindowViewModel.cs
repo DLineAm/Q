@@ -13,11 +13,17 @@ namespace Q.ViewModels
     {
         public MainContentWindowViewModel(bool isDebug)
         {
-            Sketches = WIW.GetListOfWindowSketches<LoginControl>();
+            WIW.ChangeListEvent += WIWOnChangeListEvent;
+            //Sketches = WIW.GetListOfWindowSketches<LoginControl>();
             SketchType = nameof(LoginControl);
             if (isDebug){}
 
             Instance = this;
+        }
+
+        private void WIWOnChangeListEvent(Type type)
+        {
+            Sketches = WIW.GetListOfWindowSketches(type);
         }
 
         public static MainContentWindowViewModel Instance { get; private set; }
