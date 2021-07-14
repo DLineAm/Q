@@ -114,25 +114,6 @@ namespace Q.ViewModels
         {
             if (Login == @"/startdebug")
             {
-                try
-                {
-                    //Assembly a = null;
-
-                    var a = Assembly.LoadFrom(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\..\\" + "QTestPlugin\\bin\\Debug\\netcoreapp3.1\\QTestPlugin.dll")));
-
-                    var classType = a.GetType("QTestPlugin.TestPlugin");
-                    var obj = (IPlugin)Activator.CreateInstance(classType);
-
-                    obj.DoWork();
-
-                    //var obj = Activator.CreateInstance(classType);
-                    //MethodInfo mi = classType.GetMethod("MyMethod");
-                    //mi.Invoke(obj, null);
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e.Message);
-                }
                 //MessageBox.Show("Debug Started");
                 var vm = new MainContentWindowViewModel(true);
                 WMS.ShowWindow<MainContentWindow>(vm);

@@ -7,7 +7,7 @@ namespace Q.Services
         public static readonly DependencyProperty CustomTitleProperty = DependencyProperty.RegisterAttached(
             "CustomTitle", typeof(string), typeof(UIExtensions), new PropertyMetadata(""));
 
-        public static void SetCustomTitle(DependencyObject element, string value)
+        public static void SetCustomTitle(DependencyObject element, object value)
         {
             element.SetValue(CustomTitleProperty, value);
         }

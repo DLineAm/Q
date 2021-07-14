@@ -55,6 +55,8 @@ namespace Q.Services
             instance.NormalPanel.Children.Add(wiw);
             _windowMapping[content] = wiw;
 
+            IMS.FastAddIcon(title, content.GetType(), content.DataContext.GetType());
+
             Canvas.SetZIndex(instance.MaximizePanel, 1);
 
             Canvas.SetZIndex(instance.WindowPanel, 1);
@@ -82,23 +84,6 @@ namespace Q.Services
            };
            IMS.TryAddIcon(icon,
                iconName == "" ? "Bug" : iconName);
-        }
-
-        public static void ShowWindow<TVm, TUc>(MainContentWindow window, double height, double width, string title = "", string iconName = "") where TVm : new() where TUc : UserControl
-        {
-            var uc = (UserControl) Activator.CreateInstance<TUc>();
-            ShowWindow(uc, height, width, title, iconName);
-            ISketchIcon<object> icon = new SketchIcon<object>()
-            {
-                Name = title, ClickAction = () =>
-                {
-                    //var btn = (Button) sender;
-                    uc.DataContext = Activator.CreateInstance<TVm>();;
-                    ShowWindow( uc, 400, 600, title);
-                }
-            };
-            IMS.TryAddIcon(icon,
-                iconName == "" ? "Bug" : iconName);
         }
 
         public static void CloseWindow(UserControl content)
@@ -313,56 +298,63 @@ namespace Q.Services
 
         public static bool TryInitializeJson()
         {
-            var path = Directory.GetCurrentDirectory() + @"\windowsinfo.json";
-            //var dinfo = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\windowsinfo.json");
-            if (!File.Exists(path)) return false;
-            var json = File.ReadAllText(path);
-            var list = JsonConvert.DeserializeObject<List<WindowInfo>>(json);
-            if (list.Count == 0) return false;
-            foreach (var item in list)
+            try
             {
-                var wiw = new ContentWindow
+                var path = Directory.GetCurrentDirectory() + @"\windowsinfo.json";
+                //var dinfo = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\windowsinfo.json");
+                if (!File.Exists(path)) return false;
+                var json = File.ReadAllText(path);
+                var list = JsonConvert.DeserializeObject<List<WindowInfo>>(json);
+                if (list.Count == 0) return false;
+                foreach (var item in list)
                 {
-                    ContentControl = { Content = CreateContentControl(item.ContentName) },
-                    Height = Double.IsNaN(item.Height) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Height,
-                    Width = Double.IsNaN(item.Width) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Width,
-                    BackupHeight = item.Height,
-                    BackupWidth = item.Width,
-                    WindowState = item.State,
-                    DataContext = new ContentWindowViewModel { Title = item.ContentName },
-                    Bar = {Title = item.Title}
+                    var wiw = new ContentWindow
+                    {
+                        ContentControl = { Content = CreateContentControl(item.ContentName) },
+                        Height = Double.IsNaN(item.Height) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Height,
+                        Width = Double.IsNaN(item.Width) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Width,
+                        BackupHeight = item.Height,
+                        BackupWidth = item.Width,
+                        WindowState = item.State,
+                        DataContext = new ContentWindowViewModel { Title = item.ContentName },
+                        Bar = { Title = item.Title }
 
-                };
+                    };
 
-                switch (item.Parent)
-                {
-                    case nameof(MainContentWindow.NormalPanel):
-                        MainContentWindow.Instance.NormalPanel.Children.Add(wiw);
-                        SetPosition(wiw, item);
-                        break;
-                    case nameof(MainContentWindow.MaximizePanel):
-                        MainContentWindow.Instance.MaximizePanel.Children.Add(wiw);
-                        break;
-                    case nameof(MainContentWindow.WindowPanel):
-                        MainContentWindow.Instance.WindowPanel.Children.Add(wiw);
-                        SetPosition(wiw, item);
-                        break;
+                    switch (item.Parent)
+                    {
+                        case nameof(MainContentWindow.NormalPanel):
+                            MainContentWindow.Instance.NormalPanel.Children.Add(wiw);
+                            SetPosition(wiw, item);
+                            break;
+                        case nameof(MainContentWindow.MaximizePanel):
+                            MainContentWindow.Instance.MaximizePanel.Children.Add(wiw);
+                            break;
+                        case nameof(MainContentWindow.WindowPanel):
+                            MainContentWindow.Instance.WindowPanel.Children.Add(wiw);
+                            SetPosition(wiw, item);
+                            break;
+                    }
+
+                    _windowMapping[(UserControl)wiw.ContentControl.Content] = wiw;
+
+                    Canvas.SetZIndex(wiw, (int)item.CanvasZ);
+
+                    if (item.CanvasZ > 1) ChangeTopMost((UserControl)wiw.ContentControl.Content);
+
+                    //Canvas.SetZIndex(window.MaximizePanel, 1);
+
+                    //Canvas.SetZIndex(window.WindowPanel, 1);
                 }
 
-                _windowMapping[(UserControl)wiw.ContentControl.Content] = wiw;
+                //ChangeListEvent.Invoke("");
 
-                Canvas.SetZIndex(wiw, (int)item.CanvasZ);
-
-                if(item.CanvasZ > 1) ChangeTopMost((UserControl)wiw.ContentControl.Content);
-
-                //Canvas.SetZIndex(window.MaximizePanel, 1);
-
-                //Canvas.SetZIndex(window.WindowPanel, 1);
+                return true;
             }
-
-            //ChangeListEvent.Invoke("");
-
-            return true;
+            catch
+            {
+                return false;
+            }
         }
 
         private static UserControl CreateContentControl(string typeName)
