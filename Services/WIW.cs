@@ -55,7 +55,7 @@ namespace Q.Services
             instance.NormalPanel.Children.Add(wiw);
             _windowMapping[content] = wiw;
 
-            IMS.FastAddIcon(title, content.GetType(), content.DataContext.GetType());
+            IMS.FastAddIcon(title, content.GetType(), content.DataContext.GetType(), true, "", true);
 
             Canvas.SetZIndex(instance.MaximizePanel, 1);
 
@@ -99,6 +99,13 @@ namespace Q.Services
             //window.WindowCanvas.Children.Remove(value);
             _windowMapping.Remove(content);
 
+            var type = content.GetType();
+
+            if (GetListOfWindowSketches(type).Count == 0)
+            {
+                IMS.ChangeDictValue(type);
+            }
+
             ChangeListEvent.Invoke(content.GetType());
 
             value = null;
@@ -131,6 +138,11 @@ namespace Q.Services
 
             value = null;
             content = null;
+
+            if (GetListOfWindowSketches(ucType).Count == 0)
+            {
+                IMS.ChangeDictValue(ucType);
+            }
 
             ChangeListEvent.Invoke(ucType);
         }

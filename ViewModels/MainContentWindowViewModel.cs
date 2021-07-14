@@ -3,6 +3,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using Q.Models;
 using Q.Services;
 using Q.Views;
@@ -14,12 +15,19 @@ namespace Q.ViewModels
         public MainContentWindowViewModel(bool isDebug)
         {
             WIW.ChangeListEvent += WIWOnChangeListEvent;
+            IMS.IconsListUpdateEvent += IMSOnIconsListUpdateEvent;
             //Sketches = WIW.GetListOfWindowSketches<LoginControl>();
             SketchType = nameof(LoginControl);
             if (isDebug){}
 
             Instance = this;
         }
+
+        private void IMSOnIconsListUpdateEvent(List<TaskBarIcon> list)
+        {
+            Icons = list;
+        }
+
 
         private void WIWOnChangeListEvent(Type type)
         {
@@ -50,6 +58,13 @@ namespace Q.ViewModels
         {
             get => _sketches;
             set => SetProperty(ref _sketches, value);
+        }
+
+        private List<TaskBarIcon> _icons;
+        public List<TaskBarIcon> Icons
+        {
+            get => _icons;
+            set => SetProperty(ref _icons, value);
         }
 
         public string SketchType;

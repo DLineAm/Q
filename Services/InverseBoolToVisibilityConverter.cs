@@ -7,14 +7,14 @@ using System.Windows.Data;
 
 namespace Q.Services
 {
-    class InverseBoolToVisibilityConverter : IValueConverter
+    class InverseBoolToVisibilityConverter : BaseValueConverter<InverseBoolToVisibilityConverter>
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return !(bool)value ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

@@ -15,17 +15,29 @@ namespace Q.Services
 {
     public static class IMS
     {
-        private static readonly Dictionary<object, Button> IconsMapping = new Dictionary<object, Button>();
+        public delegate void IconsListHandler(List<TaskBarIcon> list);
 
-        public static void FastAddIcon<TUc, TVm>(string title,bool multipleWindows = true, string iconName = "") where TUc : UserControl where TVm : class, new()
+        public static event IconsListHandler IconsListUpdateEvent;
+
+        private static readonly Dictionary<object, TaskBarIcon> IconsMapping = new Dictionary<object, TaskBarIcon>();
+
+        private static void SetKeyValue(object key, TaskBarIcon value)
+        {
+            IconsMapping[key] = value;
+            IconsListUpdateEvent?.Invoke(GetDictValue());
+        }
+
+        private static List<TaskBarIcon> GetDictValue() => IconsMapping.Select(p => p.Value ).ToList();
+
+        public static void FastAddIcon<TUc, TVm>(string title,bool multipleWindows = true, string iconName = "", bool isRunning = false) where TUc : UserControl where TVm : class, new()
         {
             ISketchIcon<TUc> icon = new SketchIcon<TUc> { Name = title };
-            if(!TryAddIcon(icon, iconName == "" ? "Bug" : iconName, multipleWindows)) return;
+            if(!TryAddIcon(icon, iconName == "" ? "Bug" : iconName, multipleWindows, isRunning)) return;
             SetActionClick<TUc, TVm>(icon);
             AddBehavior((SketchIcon<TUc>)icon);
         }
 
-        public static void FastAddIcon(string title, Type ucType, Type vmType , bool multipleWindows = true, string iconName = "")
+        public static void FastAddIcon(string title, Type ucType, Type vmType , bool multipleWindows = true, string iconName = "", bool isRunning = false)
         {
             var genericClass = typeof(SketchIcon<>);
             // MakeGenericType is badly named
@@ -37,7 +49,7 @@ namespace Q.Services
             //var res = (SketchIcon<object>) created;
             //res.Name = title;
 
-            if(!TryAddIcon(created, iconName == "" ? "Bug" : iconName, out var btn, vmType ,multipleWindows)) return;
+            if(!TryAddIcon(created, iconName == "" ? "Bug" : iconName, out var btn, vmType ,multipleWindows, isRunning)) return;
             //SetActionClick(created);
             AddBehavior(created, btn);
 
@@ -47,7 +59,7 @@ namespace Q.Services
             //AddBehavior((SketchIcon<TUc>)icon);
         }
 
-        public static bool TryAddIcon<TUc>(ISketchIcon<TUc> icon, string iconName, bool multipleWindows = true)
+        public static bool TryAddIcon<TUc>(ISketchIcon<TUc> icon, string iconName, bool multipleWindows = true, bool isRunning = false)
         {
             var name = icon.VmType.Name;
             if (IconsMapping.Count != 0 && IconsMapping.Select(item => ((ISketchIcon<object>)item.Key).ToType<TUc>()).Any(i => i?.VmType?.Name == name))
@@ -64,26 +76,28 @@ namespace Q.Services
                 return false;
             }
 
-            MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
-           
-            IconsMapping[(ISketchIcon<object>)icon] = btn;
+            //MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
 
+            //IconsMapping[(ISketchIcon<object>)icon] = btn;
+            SetKeyValue((ISketchIcon<object>)icon, new TaskBarIcon{Button = btn, IsRunning = isRunning});
             
             return true;
         }
 
-        public static bool TryAddIcon(object icon, string iconName, out Button button, Type vmType ,bool multipleWindows = true)
+        public static bool TryAddIcon(object icon, string iconName, out Button button, Type vmType ,bool multipleWindows = true, bool isRunning = false)
         {
             var si = (ISketchIcon<object>) icon;
 
             var intj = ((Type)si.GetType().GetInterfaces().First().GetProperty("VmType").GetValue(si)).Name;
 
             ////var name = icon.VmType.Name;
-            if (IconsMapping.Count != 0 && IconsMapping.Select(item =>(item.Key as ISketchIcon<object>)?.GetType()
-                        .GetInterfaces().First().GetProperty("VmType")
-                        ?.GetValue(item.Key) as Type)
-                .Any(i => i.Name.ToString() == intj))
+            var btnIcon = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()
+                .GetInterfaces().First().GetProperty("VmType")
+                ?.GetValue(item.Key) as Type).Name.ToString() == intj);
+            if (btnIcon.Count() != 0)
             {
+                btnIcon.First().Value.IsRunning = isRunning;
+                IconsListUpdateEvent?.Invoke(GetDictValue());
                 button = null;
                 return false;
             }
@@ -96,13 +110,23 @@ namespace Q.Services
                 return false;
             }
 
-            MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
+            //MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
 
-            IconsMapping[(ISketchIcon<object>)icon] = btn;
+            //IconsMapping[(ISketchIcon<object>)icon] = btn;
+            SetKeyValue((ISketchIcon<object>)icon, new TaskBarIcon{Button = btn, IsRunning = isRunning});
 
             button = btn;
             //button = null;
             return true;
+        }
+
+        public static void ChangeDictValue(Type ucType, bool isRunning = false)
+        {
+            var list = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()
+                .GetInterfaces().First().GetProperty("VmType")
+                ?.GetValue(item.Key) as Type).Name.ToString() == ucType.Name);
+            list.First().Value.IsRunning = isRunning;
+            IconsListUpdateEvent?.Invoke(GetDictValue());
         }
 
         public static void AddBehavior<T>(SketchIcon<T> icon) where T : UserControl
@@ -114,7 +138,7 @@ namespace Q.Services
 
             var intj = si.GetType().GetInterfaces().First().GetProperty("VmType")?.GetValue(si) as Type;
 
-            var behaviors = Interaction.GetBehaviors(btn);
+            var behaviors = Interaction.GetBehaviors(btn.Button);
             behaviors.Add(new SketchBehavior<T>(intj));
         }
 
@@ -212,9 +236,9 @@ namespace Q.Services
                 {
                     var vb = new Viewbox
                     {
-                        Stretch = Stretch.Uniform,
-                        Width = 50,
-                        Height = 50
+                        Stretch = Stretch.Fill,
+                        Width = 90,
+                        Height = 90
                     };
 
                     var cvs1 = new Canvas {Height = 90, Width = 90};
@@ -275,7 +299,7 @@ namespace Q.Services
                     throw new InvalidOperationException("UI for this SketchIcon is not displayed!");
 
                 //Если такой возможности нет - не даем запустить больше одного окна
-                if (!UIExtensions.GetMultipleWindows(btn))
+                if (!UIExtensions.GetMultipleWindows(btn.Button))
                 {
                     var list = WIW.GetListOfWindowSketches<TUc>();
 
@@ -310,7 +334,7 @@ namespace Q.Services
                     throw new InvalidOperationException("UI for this SketchIcon is not displayed!");
 
                 //Если такой возможности нет - не даем запустить больше одного окна
-                if (!UIExtensions.GetMultipleWindows(btn))
+                if (!UIExtensions.GetMultipleWindows(btn.Button))
                 {
                     var list = WIW.GetListOfWindowSketches(type);
 

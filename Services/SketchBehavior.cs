@@ -30,7 +30,9 @@ namespace Q.Services
             // Присоединение обработчиков событий            
             //this.AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             this.AssociatedObject.MouseMove += AssociatedObject_MouseMove;
+
             panel ??= VisualTreeHelper.GetParent(this.AssociatedObject) as Panel;
+            //MessageBox.Show(VisualTreeHelper.GetParent(this.AssociatedObject).GetType().Name);
             //this.AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
         }
 
@@ -158,7 +160,12 @@ namespace Q.Services
 
         private void AssociatedObject_MouseMove(object sender, MouseEventArgs e)
         {
-            if (panel == null) return;
+            if (panel == null)
+            {
+                panel ??= VisualTreeHelper.GetParent(this.AssociatedObject) as Panel;
+                if(panel == null)
+                    return;
+            }
             // Получение позиции элемента относительно Canvas
             var point = e.GetPosition(panel);
 
