@@ -19,6 +19,7 @@
     <Folder Include="Protos\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QIPlugin\QIPlugin.csproj" />
     <ProjectReference Include="..\QLibrary\QLibrary.csproj" />
   </ItemGroup>
 </Project>

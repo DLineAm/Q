@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -6,6 +9,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using Q.Services;
 using Q.Views;
+using QIPlugin;
 
 namespace Q.ViewModels
 {
@@ -110,12 +114,34 @@ namespace Q.ViewModels
         {
             if (Login == @"/startdebug")
             {
+                try
+                {
+                    //Assembly a = null;
+
+                    var a = Assembly.LoadFrom(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\..\\" + "QTestPlugin\\bin\\Debug\\netcoreapp3.1\\QTestPlugin.dll")));
+
+                    var classType = a.GetType("QTestPlugin.TestPlugin");
+                    var obj = (IPlugin)Activator.CreateInstance(classType);
+
+                    obj.DoWork();
+
+                    //var obj = Activator.CreateInstance(classType);
+                    //MethodInfo mi = classType.GetMethod("MyMethod");
+                    //mi.Invoke(obj, null);
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
                 //MessageBox.Show("Debug Started");
                 var vm = new MainContentWindowViewModel(true);
                 WMS.ShowWindow<MainContentWindow>(vm);
                 vm.Subscribe();
-                IMS.FastAddIcon<RegisterControl, RegisterViewModel>("Регистер");
+                IMS.FastAddIcon<RegisterControl, RegisterViewModel>("Регистер", true, "Store");
                 IMS.FastAddIcon<LoginControl, LoginViewModel>("Логин", false);
+
+                
+
                 //FormInitializeNotificator.Invoke();
                 WMS.CloseWindow(App.Vm);
             }

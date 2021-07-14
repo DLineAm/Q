@@ -129,7 +129,9 @@
                                                     Click="ButtonBase_OnClick"
                                                     Width="10"
                                                     Height="10"
-                                                    Background="Red"></Button>
+                                                    Background="Red"
+                                                    Opacity=".8"
+                                                    BorderThickness="0"></Button>
                                             <Border Grid.Row="1"
                                                     Background="{Binding ContentSketch}"
                                                     Height="70"
@@ -162,7 +164,8 @@
                             CornerRadius="3,3,0,0"
                             Opacity=".9"
                             VerticalAlignment="Bottom"
-                            Name="TaskBar">
+                            Name="TaskBar"
+                            MinWidth="300">
                         <Grid>
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Center"

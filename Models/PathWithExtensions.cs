@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace Q.Models
@@ -6,6 +7,8 @@ namespace Q.Models
     public class PathWithExtensions
     {
         public Path Path { get; set; }
+
+        public Viewbox ViewBox { get; set; }
 
         public string Name { get; set; }
 

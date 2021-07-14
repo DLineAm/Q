@@ -64,28 +64,40 @@ namespace Q.Services
 
             UIExtensions.SetMultipleWindows(btn, multipleWindows);
 
-            var vb = new Viewbox
-            {
-                Stretch = Stretch.Uniform,
-                Width = 50,
-                Height = 50
-            };
-
-            var cvs1 = new Canvas {Height = 90, Width = 90};
-            var cvs2 = new Canvas();
-
-            vb.Child = cvs1;
-            cvs1.Children.Add(cvs2);
-
             try
             {
                 var paths = PathsStorage.GetPath(iconName);
                 if (paths.Count == 0) paths = PathsStorage.GetPath("Bug");
-                var path = paths.First().Path;
 
-                cvs2.Children.Add(path);
+                var result = paths.First();
 
-                btn.Content = vb;
+                if (result.Path != null)
+                {
+                    var vb = new Viewbox
+                    {
+                        Stretch = Stretch.Uniform,
+                        Width = 50,
+                        Height = 50
+                    };
+
+                    var cvs1 = new Canvas {Height = 90, Width = 90};
+                    var cvs2 = new Canvas();
+
+                    vb.Child = cvs1;
+                    cvs1.Children.Add(cvs2);
+
+                    var path = paths.First().Path;
+
+                    cvs2.Children.Add(path);
+
+                    btn.Content = vb;
+                }
+                else
+                {
+                    var vb = result.ViewBox;
+                    btn.Content = vb;
+                }
+
                 btn.Click += (s, e) =>
                 {
                     icon.ClickAction();
