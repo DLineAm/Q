@@ -79,14 +79,10 @@ namespace Q.Services
             var intj = ((Type)si.GetType().GetInterfaces().First().GetProperty("VmType").GetValue(si)).Name;
 
             ////var name = icon.VmType.Name;
-            if (IconsMapping.Count != 0 && IconsMapping.Select(item =>
-                {
-                    var (key, _) = item;
-                    return ((key as ISketchIcon<object>)?.GetType()
+            if (IconsMapping.Count != 0 && IconsMapping.Select(item =>(item.Key as ISketchIcon<object>)?.GetType()
                         .GetInterfaces().First().GetProperty("VmType")
-                        ?.GetValue(key) as Type);
-                })
-                .Any(i => i.ToString() == intj))
+                        ?.GetValue(item.Key) as Type)
+                .Any(i => i.Name.ToString() == intj))
             {
                 button = null;
                 return false;
