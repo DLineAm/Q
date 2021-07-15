@@ -141,7 +141,7 @@ namespace Q.Services
         //private bool isDragging = false;
 
         // Запись точной позиции, в которой нажата кнопка
-        private Point mouseOffset = new Point(85, 0);
+        private Point mouseOffset = new Point(140, 0);
 
         //private void AssociatedObject_MouseLeftButtonDown(object sender, MouseEventArgs e)
         //{
@@ -162,7 +162,8 @@ namespace Q.Services
         {
             if (panel == null)
             {
-                panel ??= VisualTreeHelper.GetParent(this.AssociatedObject) as Panel;
+                panel ??= VisualTreeHelper.GetParent(GetAncestorOfType<ListViewItem>(sender as Button)) as Panel;
+                //panel ??= VisualTreeHelper.GetParent((DependencyObject)sender) as Panel;
                 if(panel == null)
                     return;
             }
@@ -182,10 +183,18 @@ namespace Q.Services
             }
 
             // Move the element.
-            Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, point.X - mouseOffset.X);
+            Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, point.X - (mouseOffset.X + MainContentWindow.Instance.SketchBorder.ActualWidth/2));
 
             //MainContentWindow.Instance.SketchBorder.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);
             //AssociatedObject.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);
+        }
+
+        public T GetAncestorOfType<T>(FrameworkElement child) where T : FrameworkElement
+        {
+            var parent = VisualTreeHelper.GetParent(child);
+            if (parent != null && !(parent is T)) 
+                return (T)GetAncestorOfType<T>((FrameworkElement)parent);
+            return (T) parent;
         }
 
         //private void AssociatedObject_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

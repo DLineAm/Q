@@ -9,6 +9,9 @@ namespace Q.Models
     {
         //public string TypeName { get; set; }
         public string ContentName { get; set; }
+        public string AssemblyName { get; set; }
+
+        public string IconName { get; set; }
 
         public string Title { get; set; }
 

@@ -1,4 +1,5 @@
-<Viewbox Stretch="Uniform"
+<Viewbox Stretch="Uniform" x:Name="Store"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
   <Canvas Width="96" Height="96">
       <Path Fill="#FFCEA1FE">

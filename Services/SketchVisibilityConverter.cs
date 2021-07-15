@@ -12,6 +12,7 @@ namespace Q.Services
             try
             {
                 var hasFocusTaskBar = (bool)values[0];
+                //MessageBox.Show(values[1].GetType().Name);
                 var hasFocusSketchBorder = (bool)values[1];
                 var listCount = (int)values[2];
 

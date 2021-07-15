@@ -6,7 +6,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+
 using Microsoft.Xaml.Behaviors;
+
 using Q.Models;
 using Q.ViewModels;
 using Q.Views;
@@ -27,29 +29,56 @@ namespace Q.Services
             IconsListUpdateEvent?.Invoke(GetDictValue());
         }
 
-        private static List<TaskBarIcon> GetDictValue() => IconsMapping.Select(p => p.Value ).ToList();
+        private static List<TaskBarIcon> GetDictValue() => IconsMapping.Select(p => p.Value).ToList();
 
-        public static void FastAddIcon<TUc, TVm>(string title,bool multipleWindows = true, string iconName = "", bool isRunning = false) where TUc : UserControl where TVm : class, new()
+        public static TaskBarIcon GeTaskBarIcon(Type type)
+        {
+            var pair = GetPairs(type);
+
+            return pair.Value;
+        }
+
+        private static KeyValuePair<object, TaskBarIcon> GetPairs(Type type)
+        {
+            var list = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()
+                .GetInterfaces().First().GetProperty("VmType")
+                ?.GetValue(item.Key) as Type).Name.ToString() == type.Name);
+
+            if (!list.Any()) return new KeyValuePair<object, TaskBarIcon>(null, null);
+            return list.First();
+        }
+
+        private static KeyValuePair<object, TaskBarIcon> GetPairs<T>()
+        {
+            var list = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()
+                .GetInterfaces().First().GetProperty("VmType")
+                ?.GetValue(item.Key) as Type).Name.ToString() == typeof(T).Name);
+
+            if (!list.Any()) return new KeyValuePair<object, TaskBarIcon>(null, null);
+            return list.First();
+        }
+
+        public static void FastAddIcon<TUc, TVm>(string title, bool multipleWindows = true, string iconName = "", bool isRunning = false) where TUc : UserControl where TVm : class, new()
         {
             ISketchIcon<TUc> icon = new SketchIcon<TUc> { Name = title };
-            if(!TryAddIcon(icon, iconName == "" ? "Bug" : iconName, multipleWindows, isRunning)) return;
+            if (!TryAddIcon(icon, iconName == "" ? "Bug" : iconName, multipleWindows, isRunning)) return;
             SetActionClick<TUc, TVm>(icon);
             AddBehavior((SketchIcon<TUc>)icon);
         }
 
-        public static void FastAddIcon(string title, Type ucType, Type vmType , bool multipleWindows = true, string iconName = "", bool isRunning = false)
+        public static void FastAddIcon(string title, Type ucType, Type vmType, bool multipleWindows = true, string iconName = "", bool isRunning = false)
         {
             var genericClass = typeof(SketchIcon<>);
             // MakeGenericType is badly named
             var constructedClass = genericClass.MakeGenericType(ucType);
 
             var created = Activator.CreateInstance(constructedClass);
-            ((ISketchIcon<object>) created).Name = title;
+            ((ISketchIcon<object>)created).Name = title;
 
             //var res = (SketchIcon<object>) created;
             //res.Name = title;
 
-            if(!TryAddIcon(created, iconName == "" ? "Bug" : iconName, out var btn, vmType ,multipleWindows, isRunning)) return;
+            if (!TryAddIcon(created, iconName == "" ? "Bug" : iconName, out var btn, vmType, multipleWindows, isRunning)) return;
             //SetActionClick(created);
             AddBehavior(created, btn);
 
@@ -61,10 +90,16 @@ namespace Q.Services
 
         public static bool TryAddIcon<TUc>(ISketchIcon<TUc> icon, string iconName, bool multipleWindows = true, bool isRunning = false)
         {
-            var name = icon.VmType.Name;
-            if (IconsMapping.Count != 0 && IconsMapping.Select(item => ((ISketchIcon<object>)item.Key).ToType<TUc>()).Any(i => i?.VmType?.Name == name))
+            if (icon == null) return false;
+            var name = icon.VmType;
+            //var list = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()
+            //    .GetInterfaces().First().GetProperty("VmType")
+            //    ?.GetValue(item.Key) as Type).Name.ToString() == icon.VmType.Name);
+
+            var list = GetPairs(name);
+            if (IconsMapping.Count != 0 && list.Value != null)
             {
-               
+                list.Value.IsRunning = isRunning;
                 return false;
             }
 
@@ -72,21 +107,35 @@ namespace Q.Services
 
             if (btn == null)
             {
-                
+
                 return false;
             }
 
             //MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
 
             //IconsMapping[(ISketchIcon<object>)icon] = btn;
-            SetKeyValue((ISketchIcon<object>)icon, new TaskBarIcon{Button = btn, IsRunning = isRunning});
-            
+            SetKeyValue((ISketchIcon<object>)icon, new TaskBarIcon { Button = btn, IsRunning = isRunning });
+
             return true;
         }
 
-        public static bool TryAddIcon(object icon, string iconName, out Button button, Type vmType ,bool multipleWindows = true, bool isRunning = false)
+        public static ISketchIcon<T> GetSketchIcon<T>()
         {
-            var si = (ISketchIcon<object>) icon;
+            var list = GetPairs<T>();
+
+            return list.Key as ISketchIcon<T>;
+        }
+
+        public static ISketchIcon<object> GetSketchIcon(Type type)
+        {
+            var list = GetPairs(type);
+
+            return list.Key as ISketchIcon<object>;
+        }
+
+        public static bool TryAddIcon(object icon, string iconName, out Button button, Type vmType, bool multipleWindows = true, bool isRunning = false)
+        {
+            var si = (ISketchIcon<object>)icon;
 
             var intj = ((Type)si.GetType().GetInterfaces().First().GetProperty("VmType").GetValue(si)).Name;
 
@@ -113,7 +162,7 @@ namespace Q.Services
             //MainContentWindow.Instance.IconsStackPanel.Children.Add(btn);
 
             //IconsMapping[(ISketchIcon<object>)icon] = btn;
-            SetKeyValue((ISketchIcon<object>)icon, new TaskBarIcon{Button = btn, IsRunning = isRunning});
+            SetKeyValue((ISketchIcon<object>)icon, new TaskBarIcon { Button = btn, IsRunning = isRunning });
 
             button = btn;
             //button = null;
@@ -122,10 +171,9 @@ namespace Q.Services
 
         public static void ChangeDictValue(Type ucType, bool isRunning = false)
         {
-            var list = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()
-                .GetInterfaces().First().GetProperty("VmType")
-                ?.GetValue(item.Key) as Type).Name.ToString() == ucType.Name);
-            list.First().Value.IsRunning = isRunning;
+            var list = GetPairs(ucType);
+            if (list.Key == null) return;
+            list.Value.IsRunning = isRunning;
             IconsListUpdateEvent?.Invoke(GetDictValue());
         }
 
@@ -134,7 +182,7 @@ namespace Q.Services
             if (!IconsMapping.TryGetValue(icon, out var btn))
                 throw new InvalidOperationException("UI for this Sketch is not displayed!");
 
-            var si = (ISketchIcon<object>) icon;
+            var si = (ISketchIcon<object>)icon;
 
             var intj = si.GetType().GetInterfaces().First().GetProperty("VmType")?.GetValue(si) as Type;
 
@@ -148,7 +196,7 @@ namespace Q.Services
             //    throw new InvalidOperationException("UI for this Sketch is not displayed!");
 
             var behaviors = Interaction.GetBehaviors(btn);
-            var si = (ISketchIcon<object>) icon;
+            var si = (ISketchIcon<object>)icon;
             var intj = (Type)si.GetType().GetInterfaces().First().GetProperty("VmType").GetValue(si);
             behaviors.Add(new SketchBehavior(intj));
         }
@@ -157,7 +205,7 @@ namespace Q.Services
         {
             var btn = new Button
             {
-                Background = new SolidColorBrush(Color.FromArgb(0,0,0,0)),
+                Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
                 BorderThickness = new Thickness(0),
                 Margin = new Thickness(0)
             };
@@ -171,41 +219,17 @@ namespace Q.Services
 
                 var result = paths.First();
 
-                if (result.Path != null)
-                {
-                    var vb = new Viewbox
-                    {
-                        Stretch = Stretch.Uniform,
-                        Width = 50,
-                        Height = 50
-                    };
-
-                    var cvs1 = new Canvas {Height = 90, Width = 90};
-                    var cvs2 = new Canvas();
-
-                    vb.Child = cvs1;
-                    cvs1.Children.Add(cvs2);
-
-                    var path = paths.First().Path;
-
-                    cvs2.Children.Add(path);
-
-                    btn.Content = vb;
-                }
-                else
-                {
-                    var vb = result.ViewBox;
-                    btn.Content = vb;
-                }
+                var vb = result.ViewBox;
+                btn.Content = vb;
 
                 btn.Click += (s, e) =>
-                {
-                    icon.ClickAction();
-                };
+            {
+                icon.ClickAction();
+            };
 
                 UIExtensions.SetCustomTitle(btn, icon.Name);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 return null;
@@ -218,7 +242,7 @@ namespace Q.Services
         {
             var btn = new Button
             {
-                Background = new SolidColorBrush(Color.FromArgb(0,0,0,0)),
+                Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
                 BorderThickness = new Thickness(0),
                 Margin = new Thickness(0)
             };
@@ -241,7 +265,7 @@ namespace Q.Services
                         Height = 90
                     };
 
-                    var cvs1 = new Canvas {Height = 90, Width = 90};
+                    var cvs1 = new Canvas { Height = 90, Width = 90 };
                     var cvs2 = new Canvas();
 
                     vb.Child = cvs1;
@@ -263,9 +287,9 @@ namespace Q.Services
 
                 UIExtensions.SetCustomTitle(btn, name);
 
-                var si = (ISketchIcon<object>) icon;
+                var si = (ISketchIcon<object>)icon;
 
-                var action = (Action)(icon as ISketchIcon<object>).GetType().GetInterfaces().First().GetProperty("ClickAction").GetValue((ISketchIcon<object>) icon);
+                var action = (Action)(icon as ISketchIcon<object>).GetType().GetInterfaces().First().GetProperty("ClickAction").GetValue((ISketchIcon<object>)icon);
 
                 //var action = (Action)icon.GetType().GetProperty("ClickAction").GetValue(icon);
 
@@ -281,7 +305,7 @@ namespace Q.Services
                 };
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
                 return null;
@@ -303,14 +327,14 @@ namespace Q.Services
                 {
                     var list = WIW.GetListOfWindowSketches<TUc>();
 
-                    if(list.Count != 0) return;
+                    if (list.Count != 0) return;
                 }
 
                 //Создаем каркасный элемент и добавляем туда DataContext
                 var uc = (UserControl)Activator.CreateInstance<TUc>();
                 uc.DataContext = Activator.CreateInstance<TVm>();
 
-                WIW.ShowWindow( uc, 400, 600, icon.Name);
+                WIW.ShowWindow(uc, 400, 600, icon.Name);
 
                 MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches<TUc>();
                 MainContentWindowViewModel.Instance.SketchType = typeof(TUc).Name;
@@ -338,20 +362,20 @@ namespace Q.Services
                 {
                     var list = WIW.GetListOfWindowSketches(type);
 
-                    if(list.Count != 0) return;
+                    if (list.Count != 0) return;
                 }
 
                 //Создаем каркасный элемент и добавляем туда DataContext
                 var uc = (UserControl)Activator.CreateInstance(genType);
                 uc.DataContext = Activator.CreateInstance(vmType);
 
-                WIW.ShowWindow( uc, 400, 600, name.GetValue(icon).ToString());
+                WIW.ShowWindow(uc, 400, 600, name.GetValue(icon).ToString());
 
                 MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches(genType);
                 MainContentWindowViewModel.Instance.SketchType = genType.Name;
             };
 
-            btn.Click += (s,e) => ((ISketchIcon<object>) icon).ClickAction();
+            btn.Click += (s, e) => ((ISketchIcon<object>)icon).ClickAction();
 
             //action.SetValue(si ,(System.Action)(() =>
             //{

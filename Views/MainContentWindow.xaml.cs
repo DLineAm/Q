@@ -42,7 +42,9 @@ namespace Q.Views
 
                 uc.DataContext = vm;
 
-                WIW.ShowWindow(uc, 400, 600, uc.GetType().Name);
+                IMS.FastAddIcon("TestUC", classType, vmType);
+
+                //WIW.ShowWindow(uc, 400, 600, uc.GetType().Name);
 
                 //IMS.FastAddIcon(uc.GetType().Name, uc, vm);
 

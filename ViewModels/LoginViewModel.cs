@@ -118,10 +118,9 @@ namespace Q.ViewModels
                 var vm = new MainContentWindowViewModel(true);
                 WMS.ShowWindow<MainContentWindow>(vm);
                 vm.Subscribe();
-                IMS.FastAddIcon<RegisterControl, RegisterViewModel>("Регистер", true, "Store");
-                IMS.FastAddIcon<LoginControl, LoginViewModel>("Логин", false);
 
-                
+                //IMS.FastAddIcon<RegisterControl, RegisterViewModel>("Регистер", true, "Store");
+                //IMS.FastAddIcon<LoginControl, LoginViewModel>("Логин", false);
 
                 //FormInitializeNotificator.Invoke();
                 WMS.CloseWindow(App.Vm);

@@ -41,6 +41,19 @@ namespace Q.Models
             //XamlReader.GetWpfSchemaContext();
         }
 
+        public static string GetIconName(Viewbox vb)
+        {
+            try
+            {
+                var result = Paths.First(p => p.ViewBox.Name == vb.Name);
+                return result.Name;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         private static Viewbox GetXamlViewBox(string path)
         {
             try

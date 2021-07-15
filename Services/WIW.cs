@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -67,7 +68,7 @@ namespace Q.Services
 
             if (instance.MaximizePanel.Children.Count == 0) instance.MaximizePanel.Visibility = Visibility.Collapsed;
 
-            ChangeListEvent.Invoke(content.GetType());
+            ChangeListEvent?.Invoke(content.GetType());
         }
 
         public static void ShowWindow<TVm>(UserControl content, double height, double width, string title = "", string iconName = "") where TVm : new()
@@ -106,7 +107,7 @@ namespace Q.Services
                 IMS.ChangeDictValue(type);
             }
 
-            ChangeListEvent.Invoke(content.GetType());
+            ChangeListEvent?.Invoke(content.GetType());
 
             value = null;
             content = null;
@@ -114,8 +115,8 @@ namespace Q.Services
 
         public static void CloseWindow(int index, Type ucType)
         {
-            if (_windowMapping.Count - 1 < index)
-                throw new InvalidOperationException("UI for this UserContext is not displayed");
+            //if (_windowMapping.Count - 1 < index)
+            //    throw new InvalidOperationException("UI for this UserContext is not displayed");
 
             var list = _windowMapping.Select(p => p.Key)
                 .Where(p => p.GetType() == ucType)
@@ -144,7 +145,7 @@ namespace Q.Services
                 IMS.ChangeDictValue(ucType);
             }
 
-            ChangeListEvent.Invoke(ucType);
+            ChangeListEvent?.Invoke(ucType);
         }
 
         public static void Minimize(UserControl content)
@@ -290,9 +291,11 @@ namespace Q.Services
             var list = _windowMapping.Select(items => new WindowInfo
             {
                 ContentName = items.Key.GetType().FullName,
+                AssemblyName = items.Key.GetType().Assembly.GetName().Name,
                 Title = items.Value.Bar.Title,
                 Width = items.Value.BackupWidth,
                 Height = items.Value.BackupHeight,
+                IconName = PathsStorage.GetIconName(IMS.GeTaskBarIcon(items.Key.GetType()).Button.Content as Viewbox),
                 CanvasX = Canvas.GetLeft(items.Value),
                 CanvasY = Canvas.GetTop(items.Value),
                 CanvasZ = Canvas.GetZIndex(items.Value),
@@ -314,17 +317,22 @@ namespace Q.Services
             {
                 var path = Directory.GetCurrentDirectory() + @"\windowsinfo.json";
                 //var dinfo = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\windowsinfo.json");
+
                 if (!File.Exists(path)) return false;
+
                 var json = File.ReadAllText(path);
                 var list = JsonConvert.DeserializeObject<List<WindowInfo>>(json);
+
                 if (list.Count == 0) return false;
+
                 foreach (var item in list)
                 {
+                    var uc = CreateContentControl(item);
                     var wiw = new ContentWindow
                     {
-                        ContentControl = { Content = CreateContentControl(item.ContentName) },
-                        Height = Double.IsNaN(item.Height) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Height,
-                        Width = Double.IsNaN(item.Width) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? Double.NaN : item.Width,
+                        ContentControl = { Content = uc },
+                        Height = double.IsNaN(item.Height) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? double.NaN : item.Height,
+                        Width = double.IsNaN(item.Width) || item.Parent == nameof(MainContentWindow.MaximizePanel) ? double.NaN : item.Width,
                         BackupHeight = item.Height,
                         BackupWidth = item.Width,
                         WindowState = item.State,
@@ -350,6 +358,17 @@ namespace Q.Services
 
                     _windowMapping[(UserControl)wiw.ContentControl.Content] = wiw;
 
+                    var icon = IMS.GetSketchIcon(wiw.ContentControl.Content.GetType());
+                    var btn = IMS.GeTaskBarIcon(wiw.ContentControl.Content.GetType());
+
+                    IMS.FastAddIcon(item.Title, uc.GetType(),
+                        icon != null 
+                            ? icon.VmType
+                            : uc.GetType(), true,
+                        item.IconName, true);
+
+                    //IMS.TryAddIcon(, "Bug", true, true);
+
                     Canvas.SetZIndex(wiw, (int)item.CanvasZ);
 
                     if (item.CanvasZ > 1) ChangeTopMost((UserControl)wiw.ContentControl.Content);
@@ -369,9 +388,16 @@ namespace Q.Services
             }
         }
 
-        private static UserControl CreateContentControl(string typeName)
+        private static UserControl CreateContentControl(WindowInfo info)
         {
-            var type = Type.GetType(typeName);
+            var type = Type.GetType(info.ContentName);
+            if (type == null)
+            {
+                if (info.AssemblyName == null)
+                    return new UserControl();
+                var a = Assembly.Load(info.AssemblyName);
+                type = a.GetType(info.ContentName);
+            }
             return (UserControl)Activator.CreateInstance(type);
         }
 
