@@ -141,7 +141,7 @@ namespace Q.Services
         //private bool isDragging = false;
 
         // Запись точной позиции, в которой нажата кнопка
-        private Point mouseOffset = new Point(140, 0);
+        private Point mouseOffset = new Point(28, 0);
 
         //private void AssociatedObject_MouseLeftButtonDown(object sender, MouseEventArgs e)
         //{
@@ -158,6 +158,8 @@ namespace Q.Services
         //    AssociatedObject.CaptureMouse();
         //}
 
+        public double MousePoint { get; set; }
+
         private void AssociatedObject_MouseMove(object sender, MouseEventArgs e)
         {
             if (panel == null)
@@ -172,8 +174,12 @@ namespace Q.Services
 
             if (point.X > panel.ActualWidth || point.X < 0 ||
                 point.Y > panel.ActualHeight || point.Y < 0)
+            {
+                if(MousePoint != default)
+                    Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, MousePoint);
                 return;
-
+            }
+            
             //var btn = (Button) AssociatedObject;
 
             if (MainContentWindowViewModel.Instance.SketchType != Type.Name)
@@ -182,8 +188,13 @@ namespace Q.Services
                 MainContentWindowViewModel.Instance.SketchType = Type.Name;
             }
 
+            var result = point.X - (mouseOffset.X + MainContentWindow.Instance.SketchBorder.ActualWidth/2);
+
+            MousePoint = result;
+
+
             // Move the element.
-            Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, point.X - (mouseOffset.X + MainContentWindow.Instance.SketchBorder.ActualWidth/2));
+            Canvas.SetLeft(MainContentWindow.Instance.SketchBorder, result);
 
             //MainContentWindow.Instance.SketchBorder.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);
             //AssociatedObject.SetValue(Canvas.LeftProperty, point.X - mouseOffset.X);

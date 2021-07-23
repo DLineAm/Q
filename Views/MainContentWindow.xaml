@@ -117,7 +117,7 @@
                       VerticalAlignment="Bottom">
 
                     <!--Sketch-->
-                    <Canvas Width="{Binding ElementName=IconsStackPanel, Path=ActualWidth}"
+                    <Canvas Width="{Binding ElementName=IconsListView, Path=ActualWidth}"
                             HorizontalAlignment="Center"
                             Margin="60,0">
                         <Border Background="{DynamicResource BackgroundColor}"
@@ -189,7 +189,7 @@
                             HorizontalAlignment="Center"
                             Margin="60,0,60,0"
                             Background="{StaticResource BackgroundColor}"
-                            CornerRadius="3,3,0,0"
+                            CornerRadius="6,6,0,0"
                             Opacity=".9"
                             VerticalAlignment="Bottom"
                             Name="TaskBar"

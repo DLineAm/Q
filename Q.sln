@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QLibrary", "..\QLibrary\QLi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QIPlugin", "..\QIPlugin\QIPlugin.csproj", "{CA18E148-7535-4BBB-AC53-ABEAE2ABAD2A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QTestPlugin", "..\QTestPlugin\QTestPlugin.csproj", "{419C8458-8F7D-4F2A-9C69-1D1176233681}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QTestUCPlugin", "..\QTestUCPlugin\QTestUCPlugin.csproj", "{4270D7AD-1715-4D34-9E00-AE957A866DE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QTestUCPlugin", "..\QTestUCPlugin\QTestUCPlugin.csproj", "{4270D7AD-1715-4D34-9E00-AE957A866DE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QCore", "..\QCore\QCore.csproj", "{48B55F36-E14B-406C-91FA-467028759A98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +31,14 @@ Global
 		{CA18E148-7535-4BBB-AC53-ABEAE2ABAD2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA18E148-7535-4BBB-AC53-ABEAE2ABAD2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA18E148-7535-4BBB-AC53-ABEAE2ABAD2A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{419C8458-8F7D-4F2A-9C69-1D1176233681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{419C8458-8F7D-4F2A-9C69-1D1176233681}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{419C8458-8F7D-4F2A-9C69-1D1176233681}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{419C8458-8F7D-4F2A-9C69-1D1176233681}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4270D7AD-1715-4D34-9E00-AE957A866DE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4270D7AD-1715-4D34-9E00-AE957A866DE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4270D7AD-1715-4D34-9E00-AE957A866DE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4270D7AD-1715-4D34-9E00-AE957A866DE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B55F36-E14B-406C-91FA-467028759A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B55F36-E14B-406C-91FA-467028759A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B55F36-E14B-406C-91FA-467028759A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B55F36-E14B-406C-91FA-467028759A98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

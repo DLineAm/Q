@@ -38,6 +38,8 @@ namespace Q.Services
             return pair.Value;
         }
 
+        public static int GetCount() => IconsMapping.Count;
+
         private static KeyValuePair<object, TaskBarIcon> GetPairs(Type type)
         {
             var list = IconsMapping.Where(item => ((item.Key as ISketchIcon<object>)?.GetType()

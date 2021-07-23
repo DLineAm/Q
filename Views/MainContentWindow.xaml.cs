@@ -20,12 +20,15 @@ namespace Q.Views
     /// </summary>
     public partial class MainContentWindow : Window, IView
     {
+        public static IContainer<MainContentWindow> Container { get; set; } = new MainContentWindowContainer();
         //public static WIW WIW = new WIW();
         public MainContentWindow()
         {
             InitializeComponent();
             //WIW.Subscribe(this);
             Instance = this;
+
+            ((MainContentWindowContainer) Container!)!.Test = (int) this.Width;
 
             try
             {
