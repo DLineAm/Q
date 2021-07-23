@@ -3,6 +3,7 @@
                     xmlns:local="clr-namespace:Q.Views">
     <SolidColorBrush x:Key="BackgroundColor"
                      Color="#FF334E5E"></SolidColorBrush>
+    <Color x:Key="Background">#FF334E5E</Color>
     <Style TargetType="Button">
         <Setter Property="SnapsToDevicePixels" Value="True"></Setter>
         <Setter Property="Template">

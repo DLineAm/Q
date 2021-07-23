@@ -12,6 +12,7 @@ using Q.Models;
 using Q.Services;
 using Q.ViewModels;
 using QIPlugin;
+using static Q.App;
 
 namespace Q.Views
 {
@@ -45,7 +46,7 @@ namespace Q.Views
 
                 uc.DataContext = vm;
 
-                IMS.FastAddIcon("TestUC", classType, vmType);
+                App.IMS.FastAddIcon("TestUC", classType, vmType);
 
                 //WIW.ShowWindow(uc, 400, 600, uc.GetType().Name);
 
@@ -104,6 +105,52 @@ namespace Q.Views
         //    WIW.ShowWindow(this, uc, 400, 600, UIExtensions.GetCustomTitle(btn));
         //}
 
+        public UIElementCollection GetElementCollection(string panelName)
+        {
+            switch (panelName)
+            {
+                case nameof(NormalPanel):
+                    return this.NormalPanel.Children;
+                case nameof(MaximizePanel):
+                    return this.MaximizePanel.Children;
+                case nameof(WindowPanel):
+                    return this.WindowPanel.Children;
+                default: return null!;
+            }
+        }
+
+        public void SetZIndex(string panelName, int count)
+        {
+            switch (panelName)
+            {
+                case nameof(NormalPanel):
+                    Canvas.SetZIndex(NormalPanel, count);
+                    break;
+                case nameof(MaximizePanel):
+                    Canvas.SetZIndex(NormalPanel, count);
+                    break;
+                case nameof(WindowPanel):
+                    Canvas.SetZIndex(NormalPanel, count);
+                    break;
+            }
+        }
+
+        public void ChangePanelVisibility(string panelName, Visibility visibility)
+        {
+            switch (panelName)
+            {
+                case nameof(NormalPanel):
+                    NormalPanel.Visibility = visibility;
+                    break;
+                case nameof(MaximizePanel):
+                    MaximizePanel.Visibility = visibility;
+                    break;
+                case nameof(WindowPanel):
+                    WindowPanel.Visibility = visibility;
+                    break;
+            }
+        }
+
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is ListViewItem {IsSelected: true} item)
@@ -124,7 +171,7 @@ namespace Q.Views
 
         private void MainContentWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            if(!WIW.TryInitializeJson()) return;
+            if(!App.WIW.TryInitializeJson()) return;
         }
 
         private void MainContentWindow_OnStateChanged(object? sender, EventArgs e)

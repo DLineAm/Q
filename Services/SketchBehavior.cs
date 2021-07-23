@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
 using Microsoft.Xaml.Behaviors;
-
+using Q.Models;
 using Q.ViewModels;
 using Q.Views;
+using static Q.App;
 
 namespace Q.Services
 {
@@ -81,7 +83,7 @@ namespace Q.Services
 
             if (MainContentWindowViewModel.Instance.SketchType != typeof(T).Name)
             {
-                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches<T>();
+                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches<T>().Cast<WindowSketch>().ToList();
                 MainContentWindowViewModel.Instance.SketchType = typeof(T).Name;
             }
 
@@ -184,7 +186,7 @@ namespace Q.Services
 
             if (MainContentWindowViewModel.Instance.SketchType != Type.Name)
             {
-                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches(Type);
+                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches(Type).Cast<WindowSketch>().ToList();
                 MainContentWindowViewModel.Instance.SketchType = Type.Name;
             }
 
