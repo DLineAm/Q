@@ -28,6 +28,9 @@ namespace Q.ViewModels
             Instance = this;
         }
 
+        private bool _taskBarIsHidden;
+        public bool TaskBarIsHidden { get => _taskBarIsHidden; set => SetProperty(ref _taskBarIsHidden, value); }
+
         private void IMSOnIconsListUpdateEvent(IList<object> list)
         {
             Icons = list.Cast<TaskBarIcon>().ToList();
@@ -53,7 +56,12 @@ namespace Q.ViewModels
 
         private void WIWOnChangeListEvent(Type type)
         {
-            Sketches = WIW.GetListOfWindowSketches(type).Cast<WindowSketch>().ToList();
+            Sketches = App.WIW.GetListOfWindowSketches(type).Cast<WindowSketch>().ToList();
+        }
+
+        private void WIWOnChangeListEvent(IList<object> sketches)
+        {
+            Sketches = sketches.Cast<WindowSketch>().ToList();
         }
 
         public static MainContentWindowViewModel Instance { get; private set; }

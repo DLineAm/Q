@@ -12,7 +12,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            Opacity="{TemplateBinding Opacity}"
+                            Opacity=".7"
                             CornerRadius="4"
                             Name="Border">
                         <ContentPresenter Content="{TemplateBinding Content}"
@@ -30,7 +30,6 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="Border"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         From=".7"
                                                          To="1"
                                                          Duration="0:0:0.1"></DoubleAnimation>
                                     </Storyboard>
@@ -178,4 +177,5 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
 </ResourceDictionary>

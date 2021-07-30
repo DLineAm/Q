@@ -272,14 +272,12 @@
                 <Border 
                     Width="0"
                     Name="leftBorder"
-                    Style="{StaticResource LeftBorderPanelStyle}"
-                    Background="Red">
+                    Style="{StaticResource LeftBorderPanelStyle}">
                     <ContentControl Content="{Binding PreviousView}">
 
                     </ContentControl>
                 </Border>
-                <Border Background="Blue"
-                        Name="mainBorder"
+                <Border Name="mainBorder"
                         Width="470"
                         Style="{StaticResource PanelAnimStyle}">
                     <Grid>
@@ -290,8 +288,7 @@
                     </Grid>
                     
                 </Border>
-                <Border Background="Green"
-                        Width="0"
+                <Border Width="0"
                         Name="secBorder"
                         Style="{StaticResource BorderPanelStyle}">
                     <ContentControl Content="{Binding NextView}" Width="470">

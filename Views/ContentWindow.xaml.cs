@@ -23,6 +23,8 @@ namespace Q.Views
     /// </summary>
     public partial class ContentWindow : UserControl, IView, INotifyPropertyChanged
     {
+        public bool WindowIsFocused = false;
+
         public ContentWindow()
         {
             InitializeComponent();
@@ -41,6 +43,9 @@ namespace Q.Views
 
         public double BackupHeight;
         public double BackupWidth;
+
+        public double BackupX;
+        public double BackupY;
 
         public WindowState WindowState = WindowState.Normal;
 

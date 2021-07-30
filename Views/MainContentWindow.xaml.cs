@@ -72,6 +72,23 @@ namespace Q.Views
         //    };
         //}
 
+        public void SetLeft(string panelName, int count, UserControl uc)
+        {
+            switch (panelName)
+            {
+                case nameof(NormalPanel):
+                    Canvas.SetLeft(uc, count);
+                    //NormalPanel.Children.Add()
+                    break;
+                case nameof(MaximizePanel):
+                    Canvas.SetZIndex(NormalPanel, count);
+                    break;
+                case nameof(WindowPanel):
+                    Canvas.SetZIndex(NormalPanel, count);
+                    break;
+            }
+        }
+
         public static MainContentWindow Instance { get; private set; }
 
         public void Minimize()
@@ -124,13 +141,13 @@ namespace Q.Views
             switch (panelName)
             {
                 case nameof(NormalPanel):
-                    Canvas.SetZIndex(NormalPanel, count);
+                    Panel.SetZIndex(NormalPanel, count);
                     break;
                 case nameof(MaximizePanel):
-                    Canvas.SetZIndex(NormalPanel, count);
+                    Panel.SetZIndex(NormalPanel, count);
                     break;
                 case nameof(WindowPanel):
-                    Canvas.SetZIndex(NormalPanel, count);
+                    Panel.SetZIndex(NormalPanel, count);
                     break;
             }
         }
