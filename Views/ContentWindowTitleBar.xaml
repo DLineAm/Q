@@ -67,6 +67,12 @@
         </Style>
     </UserControl.Resources>
     <Grid>
+        <TextBlock Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="White"
+                   FontSize="12"></TextBlock>
+
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="10,0">
@@ -120,10 +126,6 @@
             </Button>
         </StackPanel>
 
-        <TextBlock Text="{Binding Title, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Foreground="White"
-                   FontSize="12"></TextBlock>
+       
     </Grid>
 </UserControl>

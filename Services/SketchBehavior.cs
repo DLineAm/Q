@@ -10,11 +10,12 @@ using Microsoft.Xaml.Behaviors;
 using Q.Models;
 using Q.ViewModels;
 using Q.Views;
+using QCore;
 using static Q.App;
 
 namespace Q.Services
 {
-    public class SketchBehavior<T> : SketchBehavior where T : UserControl
+    public class SketchBehavior<T> : SketchBehavior
     {
         private Canvas canvas;
 
@@ -186,7 +187,7 @@ namespace Q.Services
 
             if (MainContentWindowViewModel.Instance.SketchType != Type.Name)
             {
-                MainContentWindowViewModel.Instance.Sketches = WIW.GetListOfWindowSketches(Type).Cast<WindowSketch>().ToList();
+                MainContentWindowViewModel.Instance.Sketches = MainContentWindowViewModel.Instance.ToSketchesList(WIW.GetListOfWindowSketches(Type).ToList()).Cast<WindowSketch>().ToList();
                 MainContentWindowViewModel.Instance.SketchType = Type.Name;
             }
 

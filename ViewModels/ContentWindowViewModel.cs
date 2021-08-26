@@ -3,10 +3,11 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Q.Annotations;
+using QCore;
 
 namespace Q.ViewModels
 {
-    public class ContentWindowViewModel : INotifyPropertyChanged
+    public class ContentWindowViewModel : ViewModel, INotifyPropertyChanged
     {
         
         //private Visibility _windowVisibility = Visibility.Visible;

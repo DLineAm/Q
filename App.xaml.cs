@@ -20,9 +20,9 @@ namespace Q
         public static string NameTitle = "Q | ";
         public static MainWindowViewModel Vm = new MainWindowViewModel();
 
-        public static IWIW WIW = GetWiw();
+        //public static IWIW WIW = GetWiw();
 
-        public static IIMS IMS = GetIms();
+        //public static IIMS IMS = GetIms();
 
 
         protected override Window CreateShell()

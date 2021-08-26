@@ -39,7 +39,16 @@
     <Border CornerRadius="6"
             BorderBrush="Black"
             BorderThickness="1"
-            Background="{StaticResource BackgroundColor}">
+            Background="{StaticResource BackgroundColor}"
+            x:Name="MainBorder"
+            Margin="0"
+            Padding="10">
+        <Border.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform></ScaleTransform>
+                <TranslateTransform></TranslateTransform>
+            </TransformGroup>
+        </Border.RenderTransform>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
@@ -48,8 +57,21 @@
 
             <local:ContentWindowTitleBar Height="25" Title="{Binding Title}" x:Name="Bar"/>
 
-            <ContentControl Grid.Row="1"
-                            Name="ContentControl"/>
+            <Grid Grid.Row="1">
+                <ContentControl Name="ContentControl"/>
+
+                <StackPanel VerticalAlignment="Bottom"
+                             HorizontalAlignment="Right">
+                    <TextBlock Foreground="White"
+                               x:Name="Test1"
+                               FontSize="20"></TextBlock>
+                    <TextBlock Foreground="White"
+                               x:Name="Test2"
+                               FontSize="20"></TextBlock>
+                </StackPanel>
+            </Grid>
+
+            
         </Grid>
     </Border>
 </UserControl>

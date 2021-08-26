@@ -5,16 +5,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Q.Models;
 using Q.Services;
 using Q.Views;
+using QCore;
 using QMappingServices;
 using static Q.App;
+using TaskBarIcon = QCore.TaskBarIcon;
 
 namespace Q.ViewModels
 {
-    public class MainContentWindowViewModel : BindableBase
+    public class MainContentWindowViewModel : BindableBase, IBaseViewModel
     {
         public MainContentWindowViewModel(bool isDebug)
         {
@@ -56,7 +60,7 @@ namespace Q.ViewModels
 
         private void WIWOnChangeListEvent(Type type)
         {
-            Sketches = App.WIW.GetListOfWindowSketches(type).Cast<WindowSketch>().ToList();
+            Sketches = ToSketchesList(WIW.GetListOfWindowSketches(type).ToList()).Cast<WindowSketch>().ToList();
         }
 
         private void WIWOnChangeListEvent(IList<object> sketches)
@@ -97,6 +101,33 @@ namespace Q.ViewModels
             set => SetProperty(ref _icons, value);
         }
 
-        public string SketchType;
+        public string SketchType { get; set; }
+
+        public List<object> ToSketchesList(List<KeyValuePair<object, IServiceBaseContainer>> pairs)
+        {
+            var result = (from items in pairs
+                select new WindowSketch
+                {
+                    Name = items.Value.Title,
+                    Type = items.Key.GetType(),
+                    Sketch = new VisualBrush((UIElement) items.Value),
+                    ContentSketch = new VisualBrush((UIElement) items.Key)
+                });
+            return result.Cast<object>().ToList();
+            //var result = (from items in _windowMapping
+            //    where items.Key.GetType() == type
+            //    select new WindowSketch
+            //    {
+            //        Name = ((ContentWindowViewModel)items.Value.DataContext).Title,
+            //        Type = type,
+            //        Sketch = new VisualBrush(items.Value),
+            //        ContentSketch = new VisualBrush(items.Key)
+            //    }).ToList();
+        }
+
+        public void SetSketches(List<object> sketchesList)
+        {
+            Sketches = sketchesList.Cast<WindowSketch>().ToList();
+        }
     }
 }

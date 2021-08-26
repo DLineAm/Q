@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using Q.Views;
 
 namespace Q.Services
 {
@@ -17,6 +18,8 @@ namespace Q.Services
 
             var window = (Window)Activator.CreateInstance(typeof(TWin));
             window.DataContext = vm;
+            if(window is MainContentWindow win)
+                QCore.MappingLists.SetMainWindow(win);
             window.Show();
             _windowMapping[vm] = window;
         }
